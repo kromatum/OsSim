@@ -20,10 +20,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import edu.upc.fib.ossim.ProcessQCM.ProcessQCMPresenter;
 import edu.upc.fib.ossim.disk.DiskPresenter;
 import edu.upc.fib.ossim.filesystem.FileSystemPresenter;
 import edu.upc.fib.ossim.memory.MemoryPresenter;
 import edu.upc.fib.ossim.process.ProcessPresenter;
+import edu.upc.fib.ossim.qcmcreator.QCMcreatorPresenter;
+import edu.upc.fib.ossim.qcmloader.QCMloaderPresenter;
 import edu.upc.fib.ossim.utils.Functions;
 import edu.upc.fib.ossim.utils.HelpDialog;
 import edu.upc.fib.ossim.utils.OpenSaveDialog;
@@ -117,6 +120,8 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 		actions.put("mngc", 30);
 		actions.put("mngd", 40);
 		actions.put("fls", 50);
+		actions.put("qcmc", 51);
+		actions.put("qcml",52);
 		actions.put("samplesSch", 60);
 		actions.put("samplesMem", 61);
 		actions.put("samplesFs", 62);
@@ -429,7 +434,14 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 				if (AppSession.getInstance().getPresenter() != null)  AppSession.getInstance().getPresenter().closeInfo();
 				AppSession.getInstance().setPresenter(new FileSystemPresenter(true));
 				break;	
-
+			case 51 : // QCM Creation
+				if (AppSession.getInstance().getPresenter() != null)  AppSession.getInstance().getPresenter().closeInfo();
+				AppSession.getInstance().setPresenter(new ProcessQCMPresenter(true));
+				break;	
+			case 52 : //QCM loading
+				if (AppSession.getInstance().getPresenter() != null)  AppSession.getInstance().getPresenter().closeInfo();
+				AppSession.getInstance().setPresenter(new QCMloaderPresenter(true));
+				break;
 			case 60:	// samples
 			case 61:
 			case 62:
