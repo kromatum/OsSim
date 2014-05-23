@@ -1,6 +1,8 @@
 package edu.upc.fib.ossim;
 
 import java.awt.Component;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 
 import javax.swing.*; 
 
@@ -24,9 +26,9 @@ public class OSSimFrame extends JFrame implements OSSim {
 
 	private void initialize() { 
 		this.setTitle("OS Sim"); 
-		this.setSize(800,600); //Mida 
+		this.setSize(1000,800); //Mida 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-		this.setResizable(false);
+		this.setResizable(true);
 		AppSession.getInstance().setApp(this);
 		Menu menu = new Menu();
 		this.setJMenuBar(menu);
@@ -59,9 +61,21 @@ public class OSSimFrame extends JFrame implements OSSim {
 	 * 
 	 * @param args	unused
 	 */
+	@SuppressWarnings("unused")
 	public static void main (String args[]) { 
-		@SuppressWarnings("unused")
-		OSSimFrame mainFrame = new OSSimFrame(); 
+		
+		try{
+		    ServerSocket socket = 
+		        new ServerSocket(9999, 10, InetAddress.getLocalHost());
+		    OSSimFrame mainFrame = new OSSimFrame(); 
+		}catch(java.net.BindException b){
+		    System.out.println("Already Running...");
+		}catch(Exception e){
+			e.printStackTrace();
+		    System.out.println(e.toString());
+		    System.exit(1);
+		}
+		
 	} 
 	
 	/**
