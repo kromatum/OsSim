@@ -123,7 +123,7 @@ public class TimerPanel extends JPanel  {
 		ltime = new JLabel(Translation.getInstance().getLabel("all_45") + " 0 " + Translation.getInstance().getLabel("all_46"));
 		this.add(ltime);
 	}
-
+	
 	/**
 	 * Starts timer and optionally second timer, disable velocity control     
 	 */
