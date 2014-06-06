@@ -66,7 +66,7 @@ public class OSSimFrame extends JFrame implements OSSim {
 		
 		try{
 		    ServerSocket socket = 
-		        new ServerSocket(9999, 10, InetAddress.getLocalHost());
+		        new ServerSocket(AppSession.port, 10, InetAddress.getLocalHost());
 		    OSSimFrame mainFrame = new OSSimFrame(); 
 		}catch(java.net.BindException b){
 		    System.out.println("Already Running...");

@@ -13,6 +13,7 @@ import edu.upc.fib.ossim.utils.ObservableIdioma;
  * resources (examples and exercises)
  * 
  * @author Alex Macia
+ * @edited by Jean Al Zreibi
  */
 
 public class AppSession {
@@ -25,6 +26,7 @@ public class AppSession {
 	private Presenter presenter;
 	private Properties resources;	// resources
 	private Properties properties;	// properties
+	public static final int port = 9000; //port used to block the application from having multiple instances
 
 	private AppSession() { 
 		idioma = new Locale("en");
