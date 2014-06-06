@@ -56,6 +56,9 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
 			e.printStackTrace();
 		}
 	}
+	
+	public void initVirtualMemory(List<MemPartition> virtualmemory, String label,
+			int osSize, Color lightgray, int memorySize){}
 
 	/**
 	 * Returns segment description: code, stack or data  
@@ -107,7 +110,9 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
 		}
 		return data;
 	}
-
+	public Object getOrderListData(ProcessMemUnit process){
+		return null;
+	}
 	/**
 	 * Returns memory occupation table header: address, segment size, segment description, pid, name, process size, duration  
 	 * 
@@ -357,6 +362,8 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
     		} else swap.add(child); // Not loaded
     	}
 	}
+	public void allocateVirtualProcess(List<MemPartition> virtualmemory,
+			List<ProcessMemUnit> swap, ProcessMemUnit processMemUnit, int i){};
 	
 	/**
      * Allocates swapped process segment from backing store into memory 

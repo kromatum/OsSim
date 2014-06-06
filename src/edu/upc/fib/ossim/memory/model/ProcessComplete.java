@@ -175,6 +175,7 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		return info;
 	}
 	
+	
 	/**
 	 * Returns process xml information, pairs attribute name - attribute value, 
 	 * includes also components xml information  
@@ -241,4 +242,5 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		}
 	    return clone;
 	}
+	
 }

@@ -46,37 +46,51 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 	 */
 	public void initMemory(List<MemPartition> memory, String strSO, int size,  Color color, int memory_size) {
 		try {
-			memory.clear();
-			// Create a memory frames, size = page size
-			int end = 0;
-			
-			while (end <  memory_size) {
-				MemPartition b = new MemPartition(end, pageSize);
-				memory.add(b);
-				end += pageSize;
-			}
-
-			//	Add SO.
-			ProcessComplete so = new ProcessComplete(0, strSO, size, -1, color);
-			int pages;
-			if (size%pageSize == 0) pages = size/pageSize;
-			else pages = size/pageSize + 1;
-
-			for (int i = 0; i< pages -1 ; i++) {
-				ProcessComponent pc = new ProcessPage(so, i, pageSize, true);
-				so.addBlock(pc);
-			}
-
-			// last page. Variable size
-			ProcessComponent pc = new ProcessPage(so, pages -1, size - (pages -1)*pageSize, true);
-			so.addBlock(pc);
-
-			allocateProcess(memory, null, so, memory_size);
-		} catch (SoSimException e) {
-			System.out.println("Error initializing memory - non contiguous memory management (Pagination)");
-			e.printStackTrace();
+		memory.clear();
+		// Create a memory frames, size = page size
+		int end = 0;
+		while (end <  memory_size) {
+			MemPartition b = new MemPartition(end, pageSize);
+			memory.add(b);
+			end += pageSize;
 		}
+
+		//	Add SO.
+		
+		ProcessComplete so = new ProcessComplete(0, strSO, size, -1, color);
+		int pages;
+		if (size%pageSize == 0) pages = size/pageSize;
+		else pages = size/pageSize + 1;
+
+		for (int i = 0; i< pages -1 ; i++) {
+			ProcessComponent pc = new ProcessPage(so, i, pageSize, true);
+			so.addBlock(pc);
+		}
+
+		// last page. Variable size
+		ProcessComponent pc = new ProcessPage(so, pages -1, size - (pages -1)*pageSize, true);
+		so.addBlock(pc);
+
+		allocateProcess(memory, null, so, memory_size);
+	} catch (SoSimException e) {
+		System.out.println("Error initializing memory - non contiguous memory management (Pagination)");
+		e.printStackTrace();
 	}
+		
+	}
+	public void initVirtualMemory(List<MemPartition> virtualmemory, String strSO, int size,  Color color, int memory_size) {
+		
+		virtualmemory.clear();
+		// Create a memory frames, size = page size
+		int end = 0;
+		while (end <  5*memory_size) {
+			MemPartition b = new MemPartition(end, pageSize);
+			virtualmemory.add(b);
+			end += pageSize;
+		}
+
+	}
+	
 
 	/**
 	 * Returns false, Pagination algorithm has no external fragmentation
@@ -128,7 +142,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 		}
 		return data;
 	}
-
+	
 	/**
 	 * Returns memory occupation table header: address, frame, page number, pid, name, process size, duration  
 	 * 
@@ -345,6 +359,43 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     	}
 	}
 	
+	public void allocateVirtualProcess(List<MemPartition> virtualmemory,
+			List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size){
+		Object[] memOrdered = virtualmemory.toArray();
+    	Arrays.sort(memOrdered);
+    	ProcessComplete parent = allocate.getParent();
+    	ProcessMemUnit child;
+    	List<MemPartition> candidates = new LinkedList<MemPartition>();
+    	
+    	// Checking memory frames
+    	for (int j = 0; j < parent.getNumBlocks(); j++) {
+    		child = parent.getBlock(j);
+    		
+        		int i = 0;	
+        		MemPartition candidate = null;
+        		while (i<memOrdered.length && candidate == null) {
+            		MemPartition partition = (MemPartition) memOrdered[i];
+            		if (!candidates.contains(partition) && partition.getAllocated() == null) {
+            			candidate = partition;// First candidate
+            		}
+            		i++;
+        		//}
+        		if (candidate != null) candidates.add(candidate);
+        		
+    		}
+    	}
+    	
+    	
+    	// Allocate pages
+    	for (int j = 0; j < parent.getNumBlocks(); j++) {
+    		child = parent.getBlock(j);
+    		//if (((ProcessComponent) child).isLoad()) { // Shoul be allocated
+    			MemPartition block = candidates.remove(0);
+    			block.setAllocated(child); 
+    		//} else swap.add(child); // Not loaded
+    	}
+		
+	};
 	/**
      * Allocates swapped process page from backing store into memory 
 	 * 
@@ -410,5 +461,11 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 		}	
 		if (found) return "@" + new Integer(block.getStart() + offset).toString();
 		else return ""; // never
+	}
+
+	@Override
+	public Object getOrderListData(ProcessMemUnit process) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -1,11 +1,16 @@
 package edu.upc.fib.ossim.memory.view;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.util.Vector;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneLayout;
 import javax.swing.table.DefaultTableColumnModel;
@@ -14,6 +19,7 @@ import edu.upc.fib.ossim.memory.MemoryPresenter;
 import edu.upc.fib.ossim.template.Presenter;
 import edu.upc.fib.ossim.template.view.FormTemplate;
 import edu.upc.fib.ossim.utils.AppTableModel;
+import edu.upc.fib.ossim.utils.Translation;
 
 
 /**
@@ -35,6 +41,11 @@ public class FormProcessPag extends FormProcess {
 	private AppTableModel tablemodel;
 	private String blockTitle;
 	
+	private JTextField textField;
+
+
+	
+	
 	/**
 	 * Constructs a form process (pagination)  
 	 * 
@@ -48,6 +59,7 @@ public class FormProcessPag extends FormProcess {
 	public FormProcessPag(Presenter presenter, String title, JLabel help, Vector<Object> values, String blockTitle) {
 		super(presenter, title, help, values);
 		this.blockTitle = blockTitle;
+
 	}
 	
 	/**
@@ -57,6 +69,8 @@ public class FormProcessPag extends FormProcess {
 	 */
 	@SuppressWarnings("unchecked")
 	public void initBlocks(Vector<Object> values) {
+		
+		
 		size.addChangeListener(presenter);	// Update page table	
 		
 		lblocks = new JLabel(blockTitle);
@@ -85,6 +99,16 @@ public class FormProcessPag extends FormProcess {
         pn.add(scroll);
 	}
 
+	public void initPageOrder() {
+		JPanel pageOrder = new JPanel();
+		JLabel label = new JLabel("PageOrder");
+        textField = new JTextField("input order here");
+        textField.addFocusListener(presenter);   
+		pageOrder.add(label);
+		pageOrder.add(textField);
+		pn.add(pageOrder);
+	}
+	
 	/**
 	 * Updates pages table rows number.    
 	 * 
@@ -127,5 +151,9 @@ public class FormProcessPag extends FormProcess {
 	public Vector<Vector<Object>> getComponentsData() {
 		// Program blocks data.
 		return tablemodel.getDataVector();
+	}
+	@SuppressWarnings("unchecked")
+	public Object getOrderListData() {	
+		return textField.getText();
 	}
 }

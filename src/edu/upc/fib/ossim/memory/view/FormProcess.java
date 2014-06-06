@@ -91,9 +91,16 @@ public class FormProcess extends FormTemplate {
 		
         initBlocks(values); 
         
+        initPageOrder();
+        
         addOKButton();
 	}
 	
+	public void initPageOrder() {
+		// doNothing
+		
+	}
+
 	/**
 	 * Contiguous memory management has no blocks, pagination and segmentation process forms 
 	 * (non contiguous management) inherit this form and implements this method 
@@ -163,6 +170,9 @@ public class FormProcess extends FormTemplate {
 	 * @see FormProcessSeg
 	 */
 	public Vector<Vector<Object>> getComponentsData() {
+		return null;
+	}
+	public Object getOrderListData() {	
 		return null;
 	}
 } 

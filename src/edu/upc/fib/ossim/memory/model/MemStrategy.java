@@ -73,6 +73,7 @@ public interface MemStrategy {
 	 * @return	data from a process' components
 	 */
 	public Vector<Vector<Object>> getProcessComponentsData(ProcessMemUnit process);
+	public Object getOrderListData(ProcessMemUnit process);
 	
 	/**
 	 * Returns memory occupation table header 
@@ -222,4 +223,10 @@ public interface MemStrategy {
 	 * @return	initial memory xml information
 	 */
 	public  Vector<Vector<Vector<String>>> getXMLDataMemory(List<MemPartition> memory);
+
+	public void initVirtualMemory(List<MemPartition> virtualmemory, String label,
+			int osSize, Color lightgray, int memorySize);
+
+	public void allocateVirtualProcess(List<MemPartition> virtualmemory,
+			List<ProcessMemUnit> swap, ProcessMemUnit processMemUnit, int i);
 }
