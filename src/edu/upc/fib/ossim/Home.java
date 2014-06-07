@@ -27,6 +27,10 @@ public class Home extends JPanel implements Observer {
 	private JButton memory;
 	private JButton fileSystem;
 	private JButton disk;
+	//QCM creator
+	private JButton qcm_creator;
+	//QCM response
+	private JButton qcm_loader;
 	private Menu menu;
 	
 	/**
@@ -64,12 +68,23 @@ public class Home extends JPanel implements Observer {
 		disk.setToolTipText(Translation.getInstance().getLabel("all_57"));
 		disk.setActionCommand("mngd");
 		disk.addActionListener(menu);
+		qcm_creator =  new JButton(Functions.getInstance().createImageIcon("qcm_creator.jpg"));
+		qcm_creator.setToolTipText(Translation.getInstance().getLabel("all_72"));
+		qcm_creator.setActionCommand("qcmc");
+		qcm_creator.addActionListener(menu);
+		qcm_loader =  new JButton(Functions.getInstance().createImageIcon("qcm_loader.jpg"));
+		qcm_loader.setToolTipText(Translation.getInstance().getLabel("all_73"));
+		qcm_loader.setActionCommand("qcml");
+		qcm_loader.addActionListener(menu);
 
 		grid.add(scheduler);
 		grid.add(memory);
 		grid.add(fileSystem);
 		grid.add(disk);
-		Functions.getInstance().makeCompactGrid(grid, 2, 2, 6, 6, 6, 6);
+		grid.add(qcm_creator);
+		grid.add(qcm_loader);
+		
+		Functions.getInstance().makeCompactGrid(grid, 2, 3, 6, 6, 6, 6);
 		
 		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, grid, 0, SpringLayout.HORIZONTAL_CENTER, this);
 		layout.putConstraint(SpringLayout.VERTICAL_CENTER, grid, 0, SpringLayout.VERTICAL_CENTER, this);
