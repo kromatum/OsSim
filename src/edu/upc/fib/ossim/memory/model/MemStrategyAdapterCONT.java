@@ -218,6 +218,12 @@ public abstract class MemStrategyAdapterCONT implements MemStrategy {
 	public void addProcessComponents(ProcessComplete p,  Vector<Vector<Object>> d) {
 		// Do nothing
 	}
+	public void addProcessPageOrders(ProcessComplete p,  Object d){
+		//Do nothing
+	}
+	public void addQuantum(ProcessComplete p,  Object d){
+		//Do nothing
+	}
 	
 	/**
 	 * Removes a process from memory

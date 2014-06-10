@@ -9,16 +9,20 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneLayout;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableColumnModel;
 
 import edu.upc.fib.ossim.memory.MemoryPresenter;
 import edu.upc.fib.ossim.template.Presenter;
 import edu.upc.fib.ossim.template.view.FormTemplate;
 import edu.upc.fib.ossim.utils.AppTableModel;
+import edu.upc.fib.ossim.utils.Functions;
 import edu.upc.fib.ossim.utils.Translation;
 
 
@@ -42,6 +46,7 @@ public class FormProcessPag extends FormProcess {
 	private String blockTitle;
 	
 	private JTextField textField;
+	protected JSpinner quantum;
 
 
 	
@@ -99,14 +104,33 @@ public class FormProcessPag extends FormProcess {
         pn.add(scroll);
 	}
 
-	public void initPageOrder() {
+	public void initPageOrder(Vector<Object>values) {
+		
 		JPanel pageOrder = new JPanel();
+		Object data = null;
+		if (values.size() > 1) data = (Object)values.get(6);
+		else data = (String)"0,0,0,0,0,0";
 		JLabel label = new JLabel("PageOrder");
-        textField = new JTextField("input order here");
+        textField = new JTextField((String)data);
         textField.addFocusListener(presenter);   
 		pageOrder.add(label);
 		pageOrder.add(textField);
 		pn.add(pageOrder);
+	}
+	
+	public void initQuantum(Vector<Object> values) {
+		grid.add(new JLabel("quantum"));
+		SpinnerModel spmodel;
+		if (values.size() > 1) spmodel = new SpinnerNumberModel(new Integer(values.get(7).toString()).intValue(), 1, 4, 1);
+		else spmodel = new SpinnerNumberModel(1, 1,4, 1);
+		quantum = new JSpinner(spmodel);
+		JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) quantum.getEditor();
+		editor.getTextField().addFocusListener(presenter);
+		quantum.setName("quantum");
+		grid.add(quantum);
+		Functions.getInstance().makeCompactGrid(grid, 6, 2, 6, 6, 6, 6);
+		pn.add(grid);
+		
 	}
 	
 	/**
@@ -152,8 +176,11 @@ public class FormProcessPag extends FormProcess {
 		// Program blocks data.
 		return tablemodel.getDataVector();
 	}
-	@SuppressWarnings("unchecked")
+	
 	public Object getOrderListData() {	
 		return textField.getText();
+	}
+	public Object getQuantumData(){
+		return quantum.getValue();
 	}
 }

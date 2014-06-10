@@ -94,7 +94,7 @@ public class QueuePainter extends PainterTemplate {
 		String title = Translation.getInstance().getLabel(keytitle);
 		Rectangle2D bounds = g2.getFont().getStringBounds(title, frc);
 		g2.drawString(title,  (int) (w/2 - bounds.getWidth()/2), 20); 
-		
+				
 		Iterator<Integer> it = presenter.iterator(getQueue());
 		
 		while (it.hasNext()) {

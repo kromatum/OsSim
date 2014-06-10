@@ -129,6 +129,8 @@ public interface MemStrategy {
 	 * @param d		components data 
 	 */
 	public void addProcessComponents(ProcessComplete p,  Vector<Vector<Object>> d);
+	public void addProcessPageOrders(ProcessComplete p,  Object d);
+	public void addQuantum(ProcessComplete p,  Object d);
 	
 	/**
 	 * Removes a process from memory, in non contiguous memory management strategies, also remove all other process components

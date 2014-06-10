@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import edu.upc.fib.ossim.memory.MemoryPresenter;
-import edu.upc.fib.ossim.memory.model.MemStrategy;
 import edu.upc.fib.ossim.template.Presenter;
 import edu.upc.fib.ossim.template.view.PainterTemplate;
 import edu.upc.fib.ossim.utils.Functions;
@@ -54,17 +53,18 @@ public class MemoryPainter extends PainterTemplate {
 	 * 
 	 * @param g	graphic context
 	 */
-	
 	public void paint(Graphics g) {
 		g2 = (Graphics2D) g;
 		Dimension size = getSize();
 		int w = (int)size.getWidth();
 		int h = (int)size.getHeight();
+		
 		g2.setPaint(Color.white);
-		//g2.fillRect(0, 0, w, h);
+		g2.fillRect(0, 0, w, h);
 		
 		// Draw Addresses
 		int memHeight = ((MemoryPresenter) presenter).getMemorySize();
+		
 		// Scroll control height
 		//if (M_UNITHEIGTH *  memHeight + 2*BORDER > h) {
 			int newHeigth = M_UNITHEIGTH *  memHeight + 2*BORDER;
@@ -89,30 +89,13 @@ public class MemoryPainter extends PainterTemplate {
 		
 		for (int i = 0; i < memHeight; i++) {
 			g.setColor(Color.BLACK);
-			g.drawString("@" + i, 2,  i*M_UNITHEIGTH + 12 + BORDER);
+			g.drawString("@" + i, 2,  i*M_UNITHEIGTH + 8 + BORDER);
 		}
 
 		Iterator<Integer> it = presenter.iterator(0);
 		int start = 0, height = 0, prog_height = 0, memStart = 0;
 		map.clear();
-		/*
-		boolean isPAG = ((MemoryPresenter) presenter).getSettings().getAlgorithm().equalsIgnoreCase("PAG");
-		if(isPAG){
-			while (it.hasNext()) {
-			start = it.next().intValue();
-			memStart = start*M_UNITHEIGTH + BORDER;
-			height = ((MemoryPresenter) presenter).getMemSize(start)*M_UNITHEIGTH;
-			
-			
-				// Draw empty block
-				Color bground = EMPTY;
-				
-				Functions.getInstance().drawTexture(g2, bground, ADDR_WIDTH, memStart, w-ADDR_WIDTH-BORDER, height);	
-			}
-			map.put(new Rectangle2D.Double(ADDR_WIDTH,memStart,w-ADDR_WIDTH-BORDER,height), new Integer(start));
-			
-		}
-		*/
+		
 		while (it.hasNext()) {
 			start = it.next().intValue();
 			memStart = start*M_UNITHEIGTH + BORDER;

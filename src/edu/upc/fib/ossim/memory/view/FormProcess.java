@@ -32,7 +32,7 @@ public class FormProcess extends FormTemplate {
 	private String spid;
 	private JTextField name;
 	protected JSpinner size;	// Size
-	private JSpinner duration;	
+	protected JSpinner duration;	
 	
 	/**
 	 * Constructs a form process
@@ -89,14 +89,20 @@ public class FormProcess extends FormTemplate {
 		Functions.getInstance().makeCompactGrid(grid, 5, 2, 6, 6, 6, 6);
 		pn.add(grid);
 		
+		initQuantum(values);
+		
         initBlocks(values); 
         
-        initPageOrder();
-        
+        initPageOrder(values);
+          
         addOKButton();
 	}
 	
-	public void initPageOrder() {
+	public void initPageOrder(Vector<Object> values) {
+		// doNothing
+		
+	}
+	public void initQuantum(Vector<Object> values) {
 		// doNothing
 		
 	}
@@ -157,7 +163,6 @@ public class FormProcess extends FormTemplate {
 		data.add(size.getValue());
 		data.add(duration.getValue());
 		data.add(color);
-
 		return data;
 	}
 	
@@ -173,6 +178,9 @@ public class FormProcess extends FormTemplate {
 		return null;
 	}
 	public Object getOrderListData() {	
+		return null;
+	}
+	public Object getQuantumData(){
 		return null;
 	}
 } 

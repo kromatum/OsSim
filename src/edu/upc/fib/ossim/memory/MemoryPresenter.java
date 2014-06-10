@@ -252,12 +252,8 @@ public class MemoryPresenter extends Presenter  {
 		super.getPainter(MEM_PAINTER).addMenuItem(menuItemsRun.get(1));
 		super.getPainter(MEM_PAINTER).addMenuItem(menuItemsRun.get(2));
 		if ("VAR".equals(mgnActionCommand)) super.getPainter(MEM_PAINTER).addMenuItem(menuItemsRun.get(5));
-		if ("PAG".equals(mgnActionCommand)) {
-			
-			super.getPainter(MEM_PAINTER).addMenuItem(menuItemsRun.get(3));
-
-			
-			
+		if ("PAG".equals(mgnActionCommand)) {			
+			super.getPainter(MEM_PAINTER).addMenuItem(menuItemsRun.get(3));		
 			
 		}
 		if ("SEG".equals(mgnActionCommand)) {
@@ -347,7 +343,7 @@ public class MemoryPresenter extends Presenter  {
 		Vector<Object> values;
 		Vector<Object> d = null;
 		Vector<Vector<Object>> c;
-		Object l;
+		Object l,q;
 		int action = actions.get(actionCommand).intValue();
 
 		switch (action) {
@@ -373,8 +369,12 @@ public class MemoryPresenter extends Presenter  {
 
 			c = ((FormProcess) getForm()).getComponentsData();
 			l = ((FormProcess) getForm()).getOrderListData();
+			q = ((FormProcess) getForm()).getQuantumData();
 
-			if (d != null) context.addProgram(d, c);
+			if (d != null){
+				if(l!= null) context.addProgram(d, c, l, q);
+				else context.addProgram(d, c);
+			}
 			break;
 		case 61:	
 			// Update process
@@ -393,11 +393,12 @@ public class MemoryPresenter extends Presenter  {
 			c = ((FormProcess) getForm()).getComponentsData();
 			//add page order list data
 			l = ((FormProcess) getForm()).getOrderListData();
-
+			q = ((FormProcess) getForm()).getQuantumData();
 
 			if (d != null) {
 				//context.removeProgram();
-				context.updProgram(d, c);
+				if(l!=null) context.updProgram(d, c, l, q);
+				else context.updProgram(d, c);		
 			}
 			break;
 		case 62:	
@@ -437,6 +438,11 @@ public class MemoryPresenter extends Presenter  {
 			// Delete program
 			context.removeProgram();
 			break;
+			/*
+		case 666:
+			context.removePage();
+			break;
+			*/
 		case 67:	
 			// Delete program component allocated in memory
 			context.removeProgramInMem(); 
@@ -455,7 +461,7 @@ public class MemoryPresenter extends Presenter  {
 		case 70:	
 			// From backing Store to memory			
 			try {
-				context.swapInProgramComponent();
+				context.swapInProgramComponent();//insert LRU algorithm
 			} catch (SoSimException e) {
 				// Error allocating. 
 				if ("me_08".equals(e.getKey())) JOptionPane.showMessageDialog(panel,e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
@@ -696,6 +702,8 @@ public class MemoryPresenter extends Presenter  {
 			return context.iteratorSwap();
 		case 3:
 			return context.iteratorVirtualPartitions();
+		case 4:
+			return context.iteratorPages();
 		default:
 			return null;
 		}
@@ -832,6 +840,8 @@ public class MemoryPresenter extends Presenter  {
 		// Form program Header 
 		return context.getFormTableHeader();
 	}
+	
+	
 
 	/**
 	 * @see ContextMemory#getFormTableInitData()

@@ -1,6 +1,7 @@
 package edu.upc.fib.ossim.memory.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +29,9 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	private int duration;	// -1 infinite
 	private Color color;
 	private List<ProcessComponent> blocks;
+	int cursor;
+	private List<Integer> pagesOrder;
+	private int quantum;
 	
 	/** 
 	 * Constructs a process
@@ -45,8 +49,12 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		this.duration = duration;
 		this.color = color;
 		this.blocks = new LinkedList<ProcessComponent>();
+		this.pagesOrder = new ArrayList<Integer>();
 		if (pid == 0) maxpid = 1; // Restart pid   
 		else maxpid++;
+		this.quantum = 1;
+		this.cursor = 0;
+		
 	}
 
 	/**
@@ -113,6 +121,35 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	public Color getColor() {
 		return color;
 	}
+	
+	public int getQuantum() {
+		return quantum;
+	}
+	
+	public void setQuantum(int quantum) {
+		this.quantum = quantum;
+	}
+	public int getCursor() {
+		return cursor;
+	}
+	
+	public void setCursor(int cursor) {
+		this.cursor = cursor;
+	}
+	
+	public int getUpdatedCursor(){
+		int res = 0;
+		if(this.cursor<this.getNumBlocks()-this.quantum){
+			res = this.cursor+this.quantum;
+			this.cursor += this.quantum;
+		}
+		else{
+			
+			this.cursor += 1;
+			res = this.getNumBlocks();
+		}
+		return res;
+	}
 
 	/**
 	 * Gets unique process identifier
@@ -135,7 +172,9 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	public void initBlocks() {
 		blocks = new LinkedList<ProcessComponent>();
 	}
-
+	public void initPagesOrder() {
+		pagesOrder = new ArrayList<Integer>();
+	}
 	
 	/**
 	 * Gets total number of component
@@ -144,6 +183,13 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	 */
 	public int getNumBlocks() {
 		return blocks.size();
+	}
+	
+	public List<Integer> getPagesOrder() {
+		return this.pagesOrder;
+	}
+	public void setPagesOrder(ArrayList<Integer> orders) {
+		this.pagesOrder = orders;
 	}
 
 	/**
@@ -228,6 +274,7 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 			clone = (ProcessComplete) super.clone();
 			
 			clone.initBlocks();
+			clone.initPagesOrder();
 			
 			// Must clone all blocks one by one
 			Iterator<ProcessComponent> it = blocks.iterator();

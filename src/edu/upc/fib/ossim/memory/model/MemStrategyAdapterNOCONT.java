@@ -109,9 +109,4 @@ public abstract class MemStrategyAdapterNOCONT implements MemStrategy {
 	public  Vector<Vector<Vector<String>>> getXMLDataMemory(List<MemPartition> memory) {
 		return null;
 	}
-
-	public Object getOrderListData(ProcessMemUnit process) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

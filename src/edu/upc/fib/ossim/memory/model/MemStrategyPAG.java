@@ -1,6 +1,7 @@
 package edu.upc.fib.ossim.memory.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -71,7 +72,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 		ProcessComponent pc = new ProcessPage(so, pages -1, size - (pages -1)*pageSize, true);
 		so.addBlock(pc);
 
-		allocateProcess(memory, null, so, memory_size);
+		allocateSO(memory, null, so, memory_size);
 	} catch (SoSimException e) {
 		System.out.println("Error initializing memory - non contiguous memory management (Pagination)");
 		e.printStackTrace();
@@ -325,14 +326,18 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 	 * @throws SoSimException	all process' pages can not be allocated
 	 */
 	public void allocateProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException {
+		//algorithm.allocateProcess(memory, swap, processQueue.get(0), memorySize);
 		Object[] memOrdered = memory.toArray();
     	Arrays.sort(memOrdered);
     	ProcessComplete parent = allocate.getParent();
+
     	ProcessMemUnit child;
     	List<MemPartition> candidates = new LinkedList<MemPartition>();
+    	int left = parent.getCursor();
+    	int right = parent.getUpdatedCursor();
     	
     	// Checking memory frames
-    	for (int j = 0; j < parent.getNumBlocks(); j++) {
+    	for (int j = left; j < right; j++) {
     		child = parent.getBlock(j);
     		if (((ProcessComponent) child).isLoad()) { // Shoul be allocated
         		int i = 0;	
@@ -345,12 +350,12 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
             		i++;
         		}
         		if (candidate != null) candidates.add(candidate);
-        		else throw new SoSimException("me_08");
+        		else throw new SoSimException("me_08");   //insert LRU algorithm
     		} 
     	}
     	
     	// Allocate pages
-    	for (int j = 0; j < parent.getNumBlocks(); j++) {
+    	for (int j = left; j < right; j++) {
     		child = parent.getBlock(j);
     		if (((ProcessComponent) child).isLoad()) { // Shoul be allocated
     			MemPartition block = candidates.remove(0);
@@ -358,9 +363,45 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     		} else swap.add(child); // Not loaded
     	}
 	}
+	public void allocateSO(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException {
+		Object[] memOrdered = memory.toArray();
+    	Arrays.sort(memOrdered);
+    	ProcessComplete parent = allocate.getParent();
+    	ProcessMemUnit child;
+    	List<MemPartition> candidates = new LinkedList<MemPartition>();
+    	
+    	// Checking memory frames
+    	for (int j = 0; j < parent.getNumBlocks(); j++) {
+    		child = parent.getBlock(j);
+        	int i = 0;	
+        	MemPartition candidate = null;
+        	while (i<memOrdered.length && candidate == null) {
+            	MemPartition partition = (MemPartition) memOrdered[i];
+            	if (!candidates.contains(partition) && partition.getAllocated() == null) {
+            		candidate = partition;// First candidate
+            	}
+            	i++;
+        	}
+        	if (candidate != null) candidates.add(candidate);
+        		else throw new SoSimException("me_08");   //insert LRU algorithm
+    		} 
+
+    	// Allocate pages
+    	for (int j = 0; j < parent.getNumBlocks(); j++) {
+    		child = parent.getBlock(j);
+    		MemPartition block = candidates.remove(0);
+    		block.setAllocated(child); 
+    	}
+	}
 	
 	public void allocateVirtualProcess(List<MemPartition> virtualmemory,
 			List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size){
+		Iterator<MemPartition>it = virtualmemory.iterator();
+		while (it.hasNext() ) {
+			MemPartition m = it.next();
+			if (m.getAllocated() != null && m.getAllocated().getPid()==allocate.getPid()) return;
+		}
+		
 		Object[] memOrdered = virtualmemory.toArray();
     	Arrays.sort(memOrdered);
     	ProcessComplete parent = allocate.getParent();
@@ -368,6 +409,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     	List<MemPartition> candidates = new LinkedList<MemPartition>();
     	
     	// Checking memory frames
+    	
     	for (int j = 0; j < parent.getNumBlocks(); j++) {
     		child = parent.getBlock(j);
     		
@@ -395,7 +437,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     		//} else swap.add(child); // Not loaded
     	}
 		
-	};
+	}
 	/**
      * Allocates swapped process page from backing store into memory 
 	 * 
@@ -426,6 +468,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 			((ProcessComponent) swapped).setLoad(true);
 		}
 		else throw new SoSimException("me_08");
+		//insert LRU algorithm
 	}
 	
 	/**
@@ -462,10 +505,35 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 		if (found) return "@" + new Integer(block.getStart() + offset).toString();
 		else return ""; // never
 	}
+	public void addProcessPageOrders(ProcessComplete p,  Object d){
+		ArrayList<Integer>orders = transformToArray(d);
+		p.setPagesOrder(orders);
+	}
+	public ArrayList<Integer> transformToArray(Object list) {
+		String s = (String) list;
+		String[] ss = s.split(",");
+		ArrayList<Integer> res = new ArrayList<Integer>();
+		for(int i=0;i<ss.length;i++) res.add(Integer.parseInt(ss[i]));
+		return res;
+	}
 
-	@Override
+
 	public Object getOrderListData(ProcessMemUnit process) {
-		// TODO Auto-generated method stub
-		return null;
+		Object data = new Object();
+		List<Integer> orders = process.getParent().getPagesOrder();
+		if(orders.size()>=1){
+		String s = "";
+		for(int i=0;i<orders.size()-1;i++) s = s+orders.get(i).toString()+",";
+		s = s+orders.get(orders.size()-1).toString();
+		data = s;
+		}
+		else data = "0,0,0,0,0,0";
+		return data;
+	}
+	
+	public void addQuantum(ProcessComplete p,  Object d){
+		Integer i = (Integer)d;
+		p.setQuantum(i.intValue());
+		
 	}
 }

@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import edu.upc.fib.ossim.memory.view.FormProcess;
 import edu.upc.fib.ossim.utils.SoSimException;
 import edu.upc.fib.ossim.utils.Translation;
 
@@ -25,6 +26,7 @@ public class ContextMemory {
 	private int osSize;
 	// Separate queue's cause different orders   
 	private List<ProcessMemUnit> processQueue; 	// Processes arriving, creation ordered 
+	private List<ProcessMemUnit>pageQueue; //Page order
 	private List<MemPartition> memory; 	// Memory structure, ordered by init address 
 	private List<MemPartition> virtualmemory; 	// Memory structure, ordered by init address 
 	private List<ProcessMemUnit> swap; 	// Processes swapped out
@@ -35,6 +37,8 @@ public class ContextMemory {
 	private ProcessMemUnit selectedProcess;
 	private MemPartition selectedPartition;
 	private ProcessMemUnit selectedSwap;
+	private ProcessMemUnit selectedPage;
+	
 
 	/**
 	 * Constructs a ContextMemory: sets main parameters (os, memory and page size), a concrete algorithm strategy and
@@ -52,6 +56,7 @@ public class ContextMemory {
     	this.algorithm = algorithm;
     	
         processQueue = new LinkedList<ProcessMemUnit>();
+        pageQueue = new LinkedList<ProcessMemUnit>();
         memory = new LinkedList<MemPartition>();
         virtualmemory = new LinkedList<MemPartition>();
         swap = new LinkedList<ProcessMemUnit>();
@@ -148,7 +153,8 @@ public class ContextMemory {
 		data.add(selectedProcess.getParent().getDuration());
 		data.add(selectedProcess.getParent().getColor());
 		data.add(algorithm.getProcessComponentsData(selectedProcess));
-		
+		data.add(algorithm.getOrderListData(selectedProcess));	
+		data.add(selectedProcess.getParent().getQuantum());
 		return data;
 	}
 
@@ -272,6 +278,16 @@ public class ContextMemory {
 		Iterator<MemPartition> it = virtualmemory.iterator();
 		while (it.hasNext()) queueInteger.add(new Integer(it.next().getStart()));	
 		return queueInteger.iterator();
+	}
+    public Iterator<Integer> iteratorPages() {
+    	// Returns ordered iterator from queue
+    	// Returns LinkedList with program's PID's
+		LinkedList<Integer> pageInteger = new LinkedList<Integer>();
+		
+		Iterator<ProcessMemUnit> it = pageQueue.iterator();
+		while (it.hasNext()) pageInteger.add(new Integer(it.next().getPid()));
+		
+		return pageInteger.iterator();
 	}
 
     /**
@@ -726,12 +742,17 @@ public class ContextMemory {
     	processQueue.add(p);
     	algorithm.addProcessComponents(p, components);
     }
-    public void addProgram(Vector<Object> data, Vector<Vector<Object>> components, Object list) {
+    public void addProgram(Vector<Object> data, Vector<Vector<Object>> components, Object list, Object quantum) {
     	// Add Program p to program's queue 
-    	ArrayList<Integer> order = transformToArray(list);
+    	List<Integer> order = transformToArray(list);
     	ProcessComplete p = new ProcessComplete(new Integer((String) data.get(0)), (String) data.get(1), (Integer) data.get(2), (Integer) data.get(3), (Color) data.get(4));
-    	processQueue.add(p);
+    	processQueue.add(p);    
+    	//pageQueue.
     	algorithm.addProcessComponents(p, components);
+    	algorithm.addProcessPageOrders(p, list);
+    	algorithm.addQuantum(p,quantum);
+    	for(Integer tmp:order) pageQueue.add(p.getBlock(tmp));
+    	
     }
 
 	public ArrayList<Integer> transformToArray(Object list) {
@@ -759,14 +780,17 @@ public class ContextMemory {
     	processQueue.add(i, p);
     	algorithm.addProcessComponents(p, components);
     }
-    public void updProgram(Vector<Object> data, Vector<Vector<Object>> components,Object list) {
+    
+    public void updProgram(Vector<Object> data, Vector<Vector<Object>> components,Object list, Object quantum) {
     	// Add Program p to program's queue 
-    	ArrayList<Integer> order = transformToArray(list);
+    	//ArrayList<Integer> order = transformToArray(list);
     	int i = processQueue.indexOf(selectedProcess);
     	processQueue.remove(selectedProcess);
     	ProcessComplete p = new ProcessComplete(new Integer((String) data.get(0)), (String) data.get(1), (Integer) data.get(2), (Integer) data.get(3), (Color) data.get(4));
     	processQueue.add(i, p);
     	algorithm.addProcessComponents(p, components);
+    	algorithm.addProcessPageOrders(p, list);
+    	algorithm.addQuantum(p, quantum);
     }
     
     /**
@@ -777,6 +801,10 @@ public class ContextMemory {
     	processQueue.remove(selectedProcess);
     }
 	
+    public void removePage() {
+		pageQueue.remove(selectedPage);
+		
+	}
     /**
      * Removes process allocated at selected partition. 
      * 
@@ -914,15 +942,28 @@ public class ContextMemory {
     	} else {
     		// Release terminated programs from memory 
     		if (memory.size() > 0) {
-    			releasePrograms(memory);
-    			releasePrograms(virtualmemory);
+    			releasePrograms(memory); 
+    			releaseVirtualPrograms(virtualmemory);
     		}
+    		
 
     		// Allocate new programs into memory. Programs ordered by init time
-    		if (processQueue.size() > 0) {
+    		
+    		if (processQueue.size() > 0){
+    			if(!algorithm.getAlgorithmInfo().contains("Pagination")) {
     			algorithm.allocateProcess(memory, swap, processQueue.get(0), memorySize);
-    			algorithm.allocateVirtualProcess(virtualmemory, swap, processQueue.get(0), 5*memorySize);
+    			//algorithm.allocateVirtualProcess(virtualmemory, swap, processQueue.get(0), 5*memorySize);
     			processQueue.remove(0);
+    			}
+    			else{
+    				algorithm.allocateProcess(memory, swap, processQueue.get(0), memorySize);
+        			algorithm.allocateVirtualProcess(virtualmemory, swap, processQueue.get(0), 5*memorySize);
+        			ProcessMemUnit pmu = processQueue.get(0);
+        			int totalSize = processQueue.size();
+        			processQueue.remove(0);
+        			processQueue.add(totalSize-1,pmu);   				
+    			}
+    			
     		}
     	}
     	return false;
@@ -941,8 +982,28 @@ public class ContextMemory {
 					updated.add(p.getParent());
 					p.getParent().setDuration(p.getParent().getDuration() - 1);
 				}
+				
     			if (p.getParent().getDuration() == 0) {
     				releaseSwap(p.getParent()); 
+    				b.setAllocated(null);
+    			}
+    		}
+    	}
+    }
+    private void releaseVirtualPrograms(List<MemPartition> virtualmemory) {
+    	// Release terminated programs from memory, and decrements duration 
+    	Iterator<MemPartition> it = virtualmemory.iterator();
+    	List<ProcessMemUnit> updated = new LinkedList<ProcessMemUnit>(); 
+    	
+    	while (it.hasNext()) {
+    		MemPartition b = it.next();
+    		ProcessMemUnit p = b.getAllocated();
+    		if (p != null && p.getParent().getDuration() >= 0) {  // Duration -1 infinite
+				if (!updated.contains(p.getParent())) {  // Only update program once
+					updated.add(p.getParent());
+					//p.getParent().setDuration(p.getParent().getDuration() - 1);
+				}
+    			if (p.getParent().getDuration() == 0) {
     				b.setAllocated(null);
     			}
     		}
@@ -997,5 +1058,9 @@ public class ContextMemory {
     	bqBkupv.clear();
     	//backup();
     }
+
+	
+
+	
 }
 

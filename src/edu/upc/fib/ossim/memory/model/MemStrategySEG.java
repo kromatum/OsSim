@@ -262,6 +262,13 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
 			p.addBlock(pc);
 		}
 	}
+	
+	public void addProcessPageOrders(ProcessComplete p,  Object d){
+		//Do nothing
+	}
+	public void addQuantum(ProcessComplete p,  Object d){
+		//Do nothing
+	}
 
 	/**
      * Compacts and merge free memory holes between segments
