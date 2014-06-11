@@ -29,6 +29,7 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	private int duration;	// -1 infinite
 	private Color color;
 	private List<ProcessComponent> blocks;
+
 	int cursor;
 	private List<Integer> pagesOrder;
 	private int quantum;
@@ -137,18 +138,17 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		this.cursor = cursor;
 	}
 	
-	public int getUpdatedCursor(){
-		int res = 0;
-		if(this.cursor<this.getNumBlocks()-this.quantum){
-			res = this.cursor+this.quantum;
-			this.cursor += this.quantum;
+	public int getUpdatedCursor() {
+		int i = 0;
+		while (i < quantum && cursor < blocks.size()) {
+			cursor++;
+			i++;
 		}
-		else{
-			
-			this.cursor += 1;
-			res = this.getNumBlocks();
-		}
-		return res;
+		return cursor;
+	}
+	
+	public boolean isDone(){
+		return cursor==blocks.size();
 	}
 
 	/**
@@ -169,8 +169,13 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		blocks.add(block);
 	}
 	
+	
 	public void initBlocks() {
 		blocks = new LinkedList<ProcessComponent>();
+	}
+	
+	public void addOrder(Integer order) {
+		pagesOrder.add(order);
 	}
 	public void initPagesOrder() {
 		pagesOrder = new ArrayList<Integer>();
@@ -188,6 +193,14 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	public List<Integer> getPagesOrder() {
 		return this.pagesOrder;
 	}
+	
+	public List<ProcessComponent> getSecondBlocks(){
+		List<ProcessComponent>res = new LinkedList<ProcessComponent>();
+		for(int i=0; i<pagesOrder.size();i++)
+			res.add(blocks.get(pagesOrder.get(i)));
+		return res;			
+	}
+	
 	public void setPagesOrder(ArrayList<Integer> orders) {
 		this.pagesOrder = orders;
 	}
@@ -200,6 +213,10 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	 */
 	public ProcessComponent getBlock(int i) {
 		return blocks.get(i);
+	}
+	
+	public Integer getOrder(int i) {
+		return pagesOrder.get(i);
 	}
 	
 	/**
@@ -282,6 +299,11 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 				ProcessComponent clonedBlock = it.next().clone();
 				clonedBlock.setParent(clone);
 				clone.addBlock(clonedBlock);
+			}
+			Iterator<Integer> ito = pagesOrder.iterator();
+			while (ito.hasNext()) {
+				Integer clonedOrder = ito.next();
+				clone.addOrder(clonedOrder);
 			}
 			
 		} catch (CloneNotSupportedException e) {

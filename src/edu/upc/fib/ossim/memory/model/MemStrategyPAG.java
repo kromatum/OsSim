@@ -50,7 +50,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 		memory.clear();
 		// Create a memory frames, size = page size
 		int end = 0;
-		while (end <  memory_size) {
+		while (end <  10) {
 			MemPartition b = new MemPartition(end, pageSize);
 			memory.add(b);
 			end += pageSize;
@@ -328,14 +328,14 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 	public void allocateProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException {
 		//algorithm.allocateProcess(memory, swap, processQueue.get(0), memorySize);
 		Object[] memOrdered = memory.toArray();
+		int OSSize = memory.get(0).getAllocated().getParent().getNumBlocks();	
     	Arrays.sort(memOrdered);
     	ProcessComplete parent = allocate.getParent();
-
+    	System.out.println("orderlist"+parent.getPagesOrder());
     	ProcessMemUnit child;
     	List<MemPartition> candidates = new LinkedList<MemPartition>();
-    	int left = parent.getCursor();
-    	int right = parent.getUpdatedCursor();
-    	
+    	int swapTimes = 0;
+    	int left = parent.getCursor(), right = parent.getUpdatedCursor();
     	// Checking memory frames
     	for (int j = left; j < right; j++) {
     		child = parent.getBlock(j);
@@ -350,9 +350,20 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
             		i++;
         		}
         		if (candidate != null) candidates.add(candidate);
-        		else throw new SoSimException("me_08");   //insert LRU algorithm
+        		//else throw new SoSimException("me_08");   
+        		else {
+        			int position = OSSize + swapTimes;//int position = LRUGetPosition();
+        			this.swapOutProcess(memory, swap,(MemPartition) memOrdered[position]);	
+					candidate = (MemPartition) memOrdered[position];
+					candidates.add(candidate);
+					swapTimes++;
+					//System.out.println("There it is!!!!");
+					//throw new SoSimException("me_08");
+				}
     		} 
     	}
+    	
+    	
     	
     	// Allocate pages
     	for (int j = left; j < right; j++) {
@@ -362,7 +373,10 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     			block.setAllocated(child); 
     		} else swap.add(child); // Not loaded
     	}
+    	
 	}
+	
+	
 	public void allocateSO(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException {
 		Object[] memOrdered = memory.toArray();
     	Arrays.sort(memOrdered);

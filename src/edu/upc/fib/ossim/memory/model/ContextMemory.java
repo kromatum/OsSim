@@ -22,7 +22,7 @@ public class ContextMemory {
 	public static final int MAX_PROCESSES = 20;
 	private MemStrategy algorithm;
 	private int memorySize; 
- 
+	private int token;
 	private int osSize;
 	// Separate queue's cause different orders   
 	private List<ProcessMemUnit> processQueue; 	// Processes arriving, creation ordered 
@@ -54,7 +54,7 @@ public class ContextMemory {
         this.memorySize = memorySize;
         this.osSize = osSize;
     	this.algorithm = algorithm;
-    	
+    	this.token = 0;
         processQueue = new LinkedList<ProcessMemUnit>();
         pageQueue = new LinkedList<ProcessMemUnit>();
         memory = new LinkedList<MemPartition>();
@@ -949,19 +949,23 @@ public class ContextMemory {
 
     		// Allocate new programs into memory. Programs ordered by init time
     		
-    		if (processQueue.size() > 0){
+    		if (processQueue.size() > 0 ){
     			if(!algorithm.getAlgorithmInfo().contains("Pagination")) {
     			algorithm.allocateProcess(memory, swap, processQueue.get(0), memorySize);
     			//algorithm.allocateVirtualProcess(virtualmemory, swap, processQueue.get(0), 5*memorySize);
     			processQueue.remove(0);
     			}
     			else{
-    				algorithm.allocateProcess(memory, swap, processQueue.get(0), memorySize);
-        			algorithm.allocateVirtualProcess(virtualmemory, swap, processQueue.get(0), 5*memorySize);
-        			ProcessMemUnit pmu = processQueue.get(0);
-        			int totalSize = processQueue.size();
-        			processQueue.remove(0);
-        			processQueue.add(totalSize-1,pmu);   				
+    				algorithm.allocateVirtualProcess(virtualmemory, swap,processQueue.get(token).getParent(), 5*memorySize);
+    				algorithm.allocateProcess(memory, swap,processQueue.get(token), memorySize);
+    				if (processQueue.get(token).getParent().isDone()) {
+    					processQueue.remove(token);
+    					if (processQueue.size() == token)
+    						token = 0;
+    				} else {
+    					token++;
+    					token = token % processQueue.size();
+    				}  				
     			}
     			
     		}
