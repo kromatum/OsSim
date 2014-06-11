@@ -91,36 +91,6 @@ public class PanelMemory extends PanelTemplate {
 		layout.putConstraint(SpringLayout.NORTH,scroll2, 10, SpringLayout.SOUTH, scroll1);
 		layout.putConstraint(SpringLayout.EAST,scroll2, -10, SpringLayout.EAST, pane);
 		pane.add(scroll2);
-		/*
-		
-		MemoryPainter mem = (MemoryPainter) presenter.getPainter(MemoryPresenter.MEM_PAINTER);
-		JScrollPane scroll0 = new JScrollPane();
-		scroll0.setViewportView(mem);
-		scroll0.setPreferredSize(new Dimension(MemoryPresenter.MEMORY_WIDTH+10, MemoryPresenter.MEMORY_HEIGHT+10));
-		scroll0.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		layout.putConstraint(SpringLayout.WEST, scroll0, 0, SpringLayout.WEST, header);
-		layout.putConstraint(SpringLayout.NORTH, scroll0, 20, SpringLayout.SOUTH, header);
-		pane.add(scroll0);
-
-		LegendPainter legend = new LegendPainter(MemoryPresenter.LEGEND_WIDTH, MemoryPresenter.LEGEND_HEIGTH);
-		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, legend, 0, SpringLayout.HORIZONTAL_CENTER, scroll0);
-		layout.putConstraint(SpringLayout.NORTH, legend, 10, SpringLayout.SOUTH, scroll0);
-		pane.add(legend);
-		
-		QueuePainter procs = (QueuePainter) presenter.getPainter(MemoryPresenter.PROGS_PAINTER);
-		JScrollPane scroll1 = new JScrollPane(procs);
-		scroll1.setPreferredSize(new Dimension(MemoryPresenter.PROGRAMS_WIDTH+10, MemoryPresenter.PROGRAMS_HEIGHT+10));
-		layout.putConstraint(SpringLayout.WEST, scroll1, 10, SpringLayout.EAST, scroll0);
-		layout.putConstraint(SpringLayout.NORTH,scroll1, 0, SpringLayout.NORTH, scroll0);
-		pane.add(scroll1);
-
-		SwapPainter swap = (SwapPainter) presenter.getPainter(MemoryPresenter.SWAP_PAINTER);
-		JScrollPane scroll2 = new JScrollPane(swap);
-		scroll2.setPreferredSize(new Dimension(MemoryPresenter.PROGRAMS_WIDTH+10, MemoryPresenter.PROGRAMS_HEIGHT+10));
-		layout.putConstraint(SpringLayout.WEST, scroll2, 0, SpringLayout.WEST, scroll1);
-		layout.putConstraint(SpringLayout.NORTH,scroll2, 10, SpringLayout.SOUTH, scroll1);
-		pane.add(scroll2);
-		*/
 	}
 
 	public void changeSpecificLayout() {

@@ -73,7 +73,8 @@ public interface MemStrategy {
 	 * @return	data from a process' components
 	 */
 	public Vector<Vector<Object>> getProcessComponentsData(ProcessMemUnit process);
-	public Object getOrderListData(ProcessMemUnit process);
+
+	public Object getQuantumListData(ProcessMemUnit process);
 	
 	/**
 	 * Returns memory occupation table header 
@@ -129,7 +130,8 @@ public interface MemStrategy {
 	 * @param d		components data 
 	 */
 	public void addProcessComponents(ProcessComplete p,  Vector<Vector<Object>> d);
-	public void addProcessPageOrders(ProcessComplete p,  Object d);
+	//public void addProcessPageOrders(ProcessComplete p,  Object d);
+	public void addQuantumListData(ProcessComplete p,  Object d);
 	public void addQuantum(ProcessComplete p,  Object d);
 	
 	/**

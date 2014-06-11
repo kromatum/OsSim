@@ -2,12 +2,17 @@ package edu.upc.fib.ossim.memory.model;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import edu.upc.fib.ossim.utils.ColorCell;
+import edu.upc.fib.ossim.utils.SoSimException;
+import edu.upc.fib.ossim.utils.StringToMap;
 
 /**
  * Process definition  (Memory management context), instance are cloneable to clone them. 
@@ -31,8 +36,8 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	private List<ProcessComponent> blocks;
 
 	int cursor;
-	private List<Integer> pagesOrder;
 	private int quantum;
+	private String quantumOrders;
 	
 	/** 
 	 * Constructs a process
@@ -50,11 +55,11 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		this.duration = duration;
 		this.color = color;
 		this.blocks = new LinkedList<ProcessComponent>();
-		this.pagesOrder = new ArrayList<Integer>();
 		if (pid == 0) maxpid = 1; // Restart pid   
 		else maxpid++;
 		this.quantum = 1;
 		this.cursor = 0;
+		this.quantumOrders = "";
 		
 	}
 
@@ -173,14 +178,7 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	public void initBlocks() {
 		blocks = new LinkedList<ProcessComponent>();
 	}
-	
-	public void addOrder(Integer order) {
-		pagesOrder.add(order);
-	}
-	public void initPagesOrder() {
-		pagesOrder = new ArrayList<Integer>();
-	}
-	
+
 	/**
 	 * Gets total number of component
 	 * 
@@ -190,21 +188,43 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		return blocks.size();
 	}
 	
-	public List<Integer> getPagesOrder() {
-		return this.pagesOrder;
-	}
 	
-	public List<ProcessComponent> getSecondBlocks(){
-		List<ProcessComponent>res = new LinkedList<ProcessComponent>();
-		for(int i=0; i<pagesOrder.size();i++)
-			res.add(blocks.get(pagesOrder.get(i)));
-		return res;			
+	@SuppressWarnings("unchecked")
+	public Map<Integer,List<ProcessComponent>> getQuantumBlocks() throws SoSimException{
+		Map<Integer,List<ProcessComponent>>res = new HashMap<Integer,List<ProcessComponent>>();		
+		StringToMap stm = new StringToMap(quantumOrders);
+		Map<Integer,List<Integer>>pagesOrder = stm.transformToMap();
+		if(pagesOrder.size()==quantum){
+			Set mappings = pagesOrder.entrySet();
+			for (Iterator i = mappings.iterator(); i.hasNext();) {	
+				List<ProcessComponent> quantumBlocks = new LinkedList<ProcessComponent>();
+				List<Integer>quantumIDs = new ArrayList<Integer>();
+				Map.Entry me = (Map.Entry)i.next();
+				Integer key = (Integer)me.getKey();
+				Object value = me.getValue();
+				quantumIDs = (ArrayList<Integer>)value;
+				for(int id:quantumIDs) {
+					quantumBlocks.add(blocks.get(id));
+				}
+				res.put(key, quantumBlocks);	
+			}
+		}	
+		else throw new SoSimException("me_16");
+		return res;
 	}
+		
 	
-	public void setPagesOrder(ArrayList<Integer> orders) {
-		this.pagesOrder = orders;
-	}
+	
 
+	public void setQuantumOrders(String quantumOrders){
+		this.quantumOrders = quantumOrders;
+	}
+	public String getQuantumOrders(){
+		return this.quantumOrders;
+	}
+	public String initQuantumOrders(){
+		return "";
+	}
 	/**
 	 * Gets component at position i of components list
 	 * 
@@ -215,9 +235,6 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		return blocks.get(i);
 	}
 	
-	public Integer getOrder(int i) {
-		return pagesOrder.get(i);
-	}
 	
 	/**
 	 * Returns process information table row, cells are ColorCell instances, 
@@ -291,7 +308,7 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 			clone = (ProcessComplete) super.clone();
 			
 			clone.initBlocks();
-			clone.initPagesOrder();
+			clone.initQuantumOrders();
 			
 			// Must clone all blocks one by one
 			Iterator<ProcessComponent> it = blocks.iterator();
@@ -300,11 +317,7 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 				clonedBlock.setParent(clone);
 				clone.addBlock(clonedBlock);
 			}
-			Iterator<Integer> ito = pagesOrder.iterator();
-			while (ito.hasNext()) {
-				Integer clonedOrder = ito.next();
-				clone.addOrder(clonedOrder);
-			}
+			clone.setQuantumOrders(quantumOrders);
 			
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();

@@ -1,11 +1,8 @@
 package edu.upc.fib.ossim.memory.view;
 
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.util.Vector;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -23,7 +20,7 @@ import edu.upc.fib.ossim.template.Presenter;
 import edu.upc.fib.ossim.template.view.FormTemplate;
 import edu.upc.fib.ossim.utils.AppTableModel;
 import edu.upc.fib.ossim.utils.Functions;
-import edu.upc.fib.ossim.utils.Translation;
+
 
 
 /**
@@ -47,9 +44,6 @@ public class FormProcessPag extends FormProcess {
 	
 	private JTextField textField;
 	protected JSpinner quantum;
-
-
-	
 	
 	/**
 	 * Constructs a form process (pagination)  
@@ -103,13 +97,14 @@ public class FormProcessPag extends FormProcess {
 
         pn.add(scroll);
 	}
+	
 
 	public void initPageOrder(Vector<Object>values) {
 		
 		JPanel pageOrder = new JPanel();
 		Object data = null;
 		if (values.size() > 1) data = (Object)values.get(6);
-		else data = (String)"0,0,0,0,0,0";
+		else data = (String)"0,0;0,0,0;0;";
 		JLabel label = new JLabel("PageOrder");
         textField = new JTextField((String)data);
         textField.addFocusListener(presenter);   

@@ -702,8 +702,6 @@ public class MemoryPresenter extends Presenter  {
 			return context.iteratorSwap();
 		case 3:
 			return context.iteratorVirtualPartitions();
-		case 4:
-			return context.iteratorPages();
 		default:
 			return null;
 		}

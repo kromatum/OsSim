@@ -1,13 +1,11 @@
 package edu.upc.fib.ossim.memory.model;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
-import edu.upc.fib.ossim.memory.view.FormProcess;
 import edu.upc.fib.ossim.utils.SoSimException;
 import edu.upc.fib.ossim.utils.Translation;
 
@@ -25,8 +23,7 @@ public class ContextMemory {
 	private int token;
 	private int osSize;
 	// Separate queue's cause different orders   
-	private List<ProcessMemUnit> processQueue; 	// Processes arriving, creation ordered 
-	private List<ProcessMemUnit>pageQueue; //Page order
+	private List<ProcessMemUnit> processQueue; 	// Processes arriving, creation ordered r
 	private List<MemPartition> memory; 	// Memory structure, ordered by init address 
 	private List<MemPartition> virtualmemory; 	// Memory structure, ordered by init address 
 	private List<ProcessMemUnit> swap; 	// Processes swapped out
@@ -37,7 +34,6 @@ public class ContextMemory {
 	private ProcessMemUnit selectedProcess;
 	private MemPartition selectedPartition;
 	private ProcessMemUnit selectedSwap;
-	private ProcessMemUnit selectedPage;
 	
 
 	/**
@@ -56,7 +52,6 @@ public class ContextMemory {
     	this.algorithm = algorithm;
     	this.token = 0;
         processQueue = new LinkedList<ProcessMemUnit>();
-        pageQueue = new LinkedList<ProcessMemUnit>();
         memory = new LinkedList<MemPartition>();
         virtualmemory = new LinkedList<MemPartition>();
         swap = new LinkedList<ProcessMemUnit>();
@@ -66,7 +61,7 @@ public class ContextMemory {
         
         //	Add OS.
         algorithm.initMemory(memory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
-        algorithm.initVirtualMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
+        algorithm.initMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, 5*memorySize);
         
     }
  
@@ -111,7 +106,7 @@ public class ContextMemory {
     	this.memorySize = memorySize;
     	this.osSize = osSize;
     	algorithm.initMemory(memory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
-    	algorithm.initVirtualMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
+    	algorithm.initMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
     	processQueue.clear();
     }
 	
@@ -126,7 +121,7 @@ public class ContextMemory {
     public void setAlgorithm(MemStrategy algorithm){
     	this.algorithm = algorithm;
     	algorithm.initMemory(memory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
-    	algorithm.initVirtualMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
+    	algorithm.initMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, 5*memorySize);
     	processQueue.clear();
     }
 
@@ -153,7 +148,7 @@ public class ContextMemory {
 		data.add(selectedProcess.getParent().getDuration());
 		data.add(selectedProcess.getParent().getColor());
 		data.add(algorithm.getProcessComponentsData(selectedProcess));
-		data.add(algorithm.getOrderListData(selectedProcess));	
+		data.add(selectedProcess.getParent().getQuantumOrders());	
 		data.add(selectedProcess.getParent().getQuantum());
 		return data;
 	}
@@ -279,16 +274,7 @@ public class ContextMemory {
 		while (it.hasNext()) queueInteger.add(new Integer(it.next().getStart()));	
 		return queueInteger.iterator();
 	}
-    public Iterator<Integer> iteratorPages() {
-    	// Returns ordered iterator from queue
-    	// Returns LinkedList with program's PID's
-		LinkedList<Integer> pageInteger = new LinkedList<Integer>();
-		
-		Iterator<ProcessMemUnit> it = pageQueue.iterator();
-		while (it.hasNext()) pageInteger.add(new Integer(it.next().getPid()));
-		
-		return pageInteger.iterator();
-	}
+    
 
     /**
      * Returns list iterator with processes in backing store (totally or partially) identifiers 
@@ -744,24 +730,16 @@ public class ContextMemory {
     }
     public void addProgram(Vector<Object> data, Vector<Vector<Object>> components, Object list, Object quantum) {
     	// Add Program p to program's queue 
-    	List<Integer> order = transformToArray(list);
+
     	ProcessComplete p = new ProcessComplete(new Integer((String) data.get(0)), (String) data.get(1), (Integer) data.get(2), (Integer) data.get(3), (Color) data.get(4));
     	processQueue.add(p);    
     	//pageQueue.
     	algorithm.addProcessComponents(p, components);
-    	algorithm.addProcessPageOrders(p, list);
+    	algorithm.addQuantumListData(p, list);
     	algorithm.addQuantum(p,quantum);
-    	for(Integer tmp:order) pageQueue.add(p.getBlock(tmp));
     	
     }
 
-	public ArrayList<Integer> transformToArray(Object list) {
-		String s = (String) list;
-		String[] ss = s.split(",");
-		ArrayList<Integer> res = new ArrayList<Integer>();
-		for(int i=0;i<ss.length;i++) res.add(Integer.parseInt(ss[i]));
-		return res;
-	}
 
 	/**
 	 * Update a process from processes queue, in pagination and segmentation 
@@ -789,7 +767,7 @@ public class ContextMemory {
     	ProcessComplete p = new ProcessComplete(new Integer((String) data.get(0)), (String) data.get(1), (Integer) data.get(2), (Integer) data.get(3), (Color) data.get(4));
     	processQueue.add(i, p);
     	algorithm.addProcessComponents(p, components);
-    	algorithm.addProcessPageOrders(p, list);
+    	algorithm.addQuantumListData(p, list);
     	algorithm.addQuantum(p, quantum);
     }
     
@@ -801,10 +779,6 @@ public class ContextMemory {
     	processQueue.remove(selectedProcess);
     }
 	
-    public void removePage() {
-		pageQueue.remove(selectedPage);
-		
-	}
     /**
      * Removes process allocated at selected partition. 
      * 

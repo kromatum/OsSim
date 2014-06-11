@@ -1,7 +1,6 @@
 package edu.upc.fib.ossim.memory.model;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -46,11 +45,11 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 	 * @param memory_size	memory size
 	 */
 	public void initMemory(List<MemPartition> memory, String strSO, int size,  Color color, int memory_size) {
-		try {
+		
 		memory.clear();
 		// Create a memory frames, size = page size
 		int end = 0;
-		while (end <  10) {
+		while (end <  memory_size) {
 			MemPartition b = new MemPartition(end, pageSize);
 			memory.add(b);
 			end += pageSize;
@@ -73,10 +72,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 		so.addBlock(pc);
 
 		allocateSO(memory, null, so, memory_size);
-	} catch (SoSimException e) {
-		System.out.println("Error initializing memory - non contiguous memory management (Pagination)");
-		e.printStackTrace();
-	}
+	
 		
 	}
 	public void initVirtualMemory(List<MemPartition> virtualmemory, String strSO, int size,  Color color, int memory_size) {
@@ -196,6 +192,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     	header.add(Translation.getInstance().getLabel("me_76"));	// Load?
 		return header;
 	}
+
 
 	/**
 	 * Returns process form table initial data. Initially a process has one page that would be load into memory   
@@ -331,7 +328,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 		int OSSize = memory.get(0).getAllocated().getParent().getNumBlocks();	
     	Arrays.sort(memOrdered);
     	ProcessComplete parent = allocate.getParent();
-    	System.out.println("orderlist"+parent.getPagesOrder());
+    	System.out.println("quantum blocks size"+parent.getQuantumBlocks().size());
     	ProcessMemUnit child;
     	List<MemPartition> candidates = new LinkedList<MemPartition>();
     	int swapTimes = 0;
@@ -363,8 +360,6 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     		} 
     	}
     	
-    	
-    	
     	// Allocate pages
     	for (int j = left; j < right; j++) {
     		child = parent.getBlock(j);
@@ -377,7 +372,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 	}
 	
 	
-	public void allocateSO(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException {
+	public void allocateSO(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) {
 		Object[] memOrdered = memory.toArray();
     	Arrays.sort(memOrdered);
     	ProcessComplete parent = allocate.getParent();
@@ -396,8 +391,8 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
             	}
             	i++;
         	}
-        	if (candidate != null) candidates.add(candidate);
-        		else throw new SoSimException("me_08");   //insert LRU algorithm
+        	 candidates.add(candidate);
+        	
     		} 
 
     	// Allocate pages
@@ -519,32 +514,17 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 		if (found) return "@" + new Integer(block.getStart() + offset).toString();
 		else return ""; // never
 	}
-	public void addProcessPageOrders(ProcessComplete p,  Object d){
-		ArrayList<Integer>orders = transformToArray(d);
-		p.setPagesOrder(orders);
-	}
-	public ArrayList<Integer> transformToArray(Object list) {
-		String s = (String) list;
-		String[] ss = s.split(",");
-		ArrayList<Integer> res = new ArrayList<Integer>();
-		for(int i=0;i<ss.length;i++) res.add(Integer.parseInt(ss[i]));
-		return res;
-	}
-
-
-	public Object getOrderListData(ProcessMemUnit process) {
+	
+	public Object getQuantumListData(ProcessMemUnit process) {
 		Object data = new Object();
-		List<Integer> orders = process.getParent().getPagesOrder();
-		if(orders.size()>=1){
-		String s = "";
-		for(int i=0;i<orders.size()-1;i++) s = s+orders.get(i).toString()+",";
-		s = s+orders.get(orders.size()-1).toString();
+		String s = process.getParent().getQuantumOrders();
 		data = s;
-		}
-		else data = "0,0,0,0,0,0";
 		return data;
 	}
-	
+	public void addQuantumListData(ProcessComplete p,  Object d) {
+		String data = (String)d;
+		p.setQuantumOrders(data);
+	}
 	public void addQuantum(ProcessComplete p,  Object d){
 		Integer i = (Integer)d;
 		p.setQuantum(i.intValue());

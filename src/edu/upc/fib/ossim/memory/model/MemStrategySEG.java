@@ -165,7 +165,7 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
     	header.add(Translation.getInstance().getLabel("me_76"));
 		return header;
 	}
-
+	
 	/**
 	 * Returns process form table initial data. Any process has 3 segments: code, data and stack, 
 	 * initially every segment would be load into memory and its size is 1 kb   
@@ -191,7 +191,6 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
     	data.add(row2);
 		return data;
 	}
-	
 	/**
 	 * Returns process allocation tables header, process' segments information: segment description, size, 
 	 * start memory address and a valid field that indicates if segment is load or it is in the backing store  
@@ -263,7 +262,10 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
 		}
 	}
 	
-	public void addProcessPageOrders(ProcessComplete p,  Object d){
+	public Object getQuantumListData(ProcessMemUnit process){
+		return null;
+	}
+	public void addQuantumListData(ProcessComplete p,  Object d) {
 		//Do nothing
 	}
 	public void addQuantum(ProcessComplete p,  Object d){

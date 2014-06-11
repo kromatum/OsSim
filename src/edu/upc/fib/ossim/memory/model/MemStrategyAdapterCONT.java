@@ -126,7 +126,7 @@ public abstract class MemStrategyAdapterCONT implements MemStrategy {
 	public Vector<Vector<Object>> getProcessComponentsData(ProcessMemUnit process) {
 		return null;
 	}
-	public Object getOrderListData(ProcessMemUnit process){
+	public Object getQuantumListData(ProcessMemUnit process){
 		return null;
 	}
 	
@@ -177,7 +177,6 @@ public abstract class MemStrategyAdapterCONT implements MemStrategy {
 	public Vector<Object> getFormTableHeader() {
 		return null;
 	}
-	
 	/**
 	 * Returns null. There is no component data in this strategy  
 	 * 
@@ -218,7 +217,8 @@ public abstract class MemStrategyAdapterCONT implements MemStrategy {
 	public void addProcessComponents(ProcessComplete p,  Vector<Vector<Object>> d) {
 		// Do nothing
 	}
-	public void addProcessPageOrders(ProcessComplete p,  Object d){
+	
+	public void addQuantumListData(ProcessComplete p,  Object d) {
 		//Do nothing
 	}
 	public void addQuantum(ProcessComplete p,  Object d){
