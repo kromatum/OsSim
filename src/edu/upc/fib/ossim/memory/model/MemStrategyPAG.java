@@ -388,15 +388,14 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     			block.setAllocated(child); 
     		} else swap.add(child); // Not loaded
     	}
-    */	
+    	*/
 	}
-	public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException {
-		//algorithm.allocateProcess(memory, swap, processQueue.get(0), memorySize);
+	public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, 
+			ProcessMemUnit allocate, int memory_size) throws SoSimException {
 		Object[] memOrdered = memory.toArray();
 		int OSSize = memory.get(0).getAllocated().getParent().getNumBlocks();	
     	Arrays.sort(memOrdered);
     	ProcessComplete parent = allocate.getParent();
-    	//System.out.println("quantum blocks size"+parent.getQuantumBlocks().size());
     	Map<Integer, List<ProcessComponent>>quantumBlocks = parent.getQuantumBlocks();
     	int key = parent.getUpdatedKey();
     	List<ProcessComponent> values = quantumBlocks.get(key);
@@ -407,8 +406,9 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     		child = values.get(j);
     		((ProcessComponent) child).setTime(0);
     		addOtherTime(memory,child);
-    		if (((ProcessComponent) child).isLoad()&&!isInMemory(memory,child)) { // Shoul be allocated
-    			
+    		if(swap.contains(child)) this.swapInProcessComponent(memory, swap, child, memory_size);
+    		else{
+    		if (((ProcessComponent) child).isLoad()&&!isInMemory(memory,child)) { // Should be allocated   			
         		int i = 0;	
         		MemPartition candidate = null;
         		while (i<memOrdered.length && candidate == null) {
@@ -425,12 +425,10 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
         			this.swapOutProcess(memory, swap,(MemPartition) memOrdered[position]);	
 					candidate = (MemPartition) memOrdered[position];
 					candidates.add(candidate);
-					//System.out.println("There it is!!!!");
-					//throw new SoSimException("me_08");
 				}
     		} 
     	}
-    	
+    	}
     	// Allocate pages
     	for (int j = 0; j < values.size(); j++) {
     		child = values.get(j);
@@ -563,7 +561,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 	public void swapInProcessComponent(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit swapped, int memory_size) throws SoSimException {
 		Object[] memOrdered = memory.toArray();
     	Arrays.sort(memOrdered);
-    	
+    	int OSSize = memory.get(0).getAllocated().getParent().getNumBlocks();	
     	int i = 0;	
     	MemPartition candidate = null;
 		while (i<memOrdered.length && candidate == null) {
@@ -578,8 +576,14 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 			candidate.setAllocated(swapped); 
 			((ProcessComponent) swapped).setLoad(true);
 		}
-		else throw new SoSimException("me_08");
-		//insert LRU algorithm
+		//else throw new SoSimException("me_08");
+		else {
+			int position = LRUFindPosition(memory,OSSize);
+			this.swapOutProcess(memory, swap,(MemPartition) memOrdered[position]);
+			candidate = (MemPartition) memOrdered[position];
+			candidate.setAllocated(swapped); 
+			((ProcessComponent) swapped).setLoad(true);
+		}
 	}
 	
 	/**

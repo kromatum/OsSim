@@ -89,7 +89,7 @@ public class MemoryPainter extends PainterTemplate {
 		
 		for (int i = 0; i < memHeight; i++) {
 			g.setColor(Color.BLACK);
-			g.drawString("@" + i, 2,  i*M_UNITHEIGTH + 8 + BORDER);
+			g.drawString("@" + i, 2,  i*M_UNITHEIGTH + 12 + BORDER);
 		}
 
 		Iterator<Integer> it = presenter.iterator(0);
