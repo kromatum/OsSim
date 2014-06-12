@@ -295,7 +295,8 @@ public abstract class MemStrategyAdapterCONT implements MemStrategy {
 	}
 	public void allocateVirtualProcess(List<MemPartition> virtualmemory,
 			List<ProcessMemUnit> swap, ProcessMemUnit processMemUnit, int i){};
-
+	
+	public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException {}
 	protected abstract void allocateCandidate(List<MemPartition> memory, MemPartition candidate, ProcessMemUnit allocate);
 	
 	/**

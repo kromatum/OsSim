@@ -931,7 +931,7 @@ public class ContextMemory {
     			}
     			else{
     				algorithm.allocateVirtualProcess(virtualmemory, swap,processQueue.get(token).getParent(), 5*memorySize);
-    				algorithm.allocateProcess(memory, swap,processQueue.get(token), memorySize);
+    				algorithm.allocateQuantumProcess(memory, swap,processQueue.get(token), memorySize);
     				if (processQueue.get(token).getParent().isDone()) {
     					processQueue.remove(token);
     					if (processQueue.size() == token)

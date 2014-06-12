@@ -21,6 +21,7 @@ public abstract class ProcessComponent implements ProcessMemUnit, Cloneable {
 	protected int size;
 	protected boolean load;
 
+
 	/**
 	 * Constructs a process component
 	 * 

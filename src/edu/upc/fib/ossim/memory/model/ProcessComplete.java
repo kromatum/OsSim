@@ -35,9 +35,10 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	private Color color;
 	private List<ProcessComponent> blocks;
 
-	int cursor;
+	int key;
 	private int quantum;
 	private String quantumOrders;
+	
 	
 	/** 
 	 * Constructs a process
@@ -58,7 +59,7 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		if (pid == 0) maxpid = 1; // Restart pid   
 		else maxpid++;
 		this.quantum = 1;
-		this.cursor = 0;
+		this.key = 0;
 		this.quantumOrders = "";
 		
 	}
@@ -135,25 +136,17 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	public void setQuantum(int quantum) {
 		this.quantum = quantum;
 	}
-	public int getCursor() {
-		return cursor;
-	}
 	
-	public void setCursor(int cursor) {
-		this.cursor = cursor;
-	}
 	
-	public int getUpdatedCursor() {
-		int i = 0;
-		while (i < quantum && cursor < blocks.size()) {
-			cursor++;
-			i++;
+	public int getUpdatedKey() {
+		if (key < quantum) {
+			key++;
 		}
-		return cursor;
+		return key-1;
 	}
 	
 	public boolean isDone(){
-		return cursor==blocks.size();
+		return key==quantum;
 	}
 
 	/**

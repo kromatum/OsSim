@@ -372,7 +372,10 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
     	}
 	}
 	public void allocateVirtualProcess(List<MemPartition> virtualmemory,
-			List<ProcessMemUnit> swap, ProcessMemUnit processMemUnit, int i){};
+			List<ProcessMemUnit> swap, ProcessMemUnit processMemUnit, int i){}
+public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, 
+		ProcessMemUnit allocate, int memory_size) throws SoSimException {}
+
 	
 	/**
      * Allocates swapped process segment from backing store into memory 

@@ -2,9 +2,11 @@ package edu.upc.fib.ossim.memory.model;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import edu.upc.fib.ossim.utils.ColorCell;
@@ -323,7 +325,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 	 * @throws SoSimException	all process' pages can not be allocated
 	 */
 	public void allocateProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException {
-		//algorithm.allocateProcess(memory, swap, processQueue.get(0), memorySize);
+/*
 		Object[] memOrdered = memory.toArray();
 		int OSSize = memory.get(0).getAllocated().getParent().getNumBlocks();	
     	Arrays.sort(memOrdered);
@@ -333,6 +335,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     	List<MemPartition> candidates = new LinkedList<MemPartition>();
     	int swapTimes = 0;
     	int left = parent.getCursor(), right = parent.getUpdatedCursor();
+    	
     	// Checking memory frames
     	for (int j = left; j < right; j++) {
     		child = parent.getBlock(j);
@@ -368,10 +371,69 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     			block.setAllocated(child); 
     		} else swap.add(child); // Not loaded
     	}
+    */	
+	}
+	public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException {
+		//algorithm.allocateProcess(memory, swap, processQueue.get(0), memorySize);
+		Object[] memOrdered = memory.toArray();
+		int OSSize = memory.get(0).getAllocated().getParent().getNumBlocks();	
+    	Arrays.sort(memOrdered);
+    	ProcessComplete parent = allocate.getParent();
+    	//System.out.println("quantum blocks size"+parent.getQuantumBlocks().size());
+    	Map<Integer, List<ProcessComponent>>quantumBlocks = parent.getQuantumBlocks();
+    	int key = parent.getUpdatedKey();
+    	List<ProcessComponent> values = quantumBlocks.get(key);
+    	ProcessMemUnit child;
+    	List<MemPartition> candidates = new LinkedList<MemPartition>();
+    	int swapTimes = 0;
+    	// Checking memory frames
+    	for (int j = 0; j < values.size(); j++) {
+    		child = values.get(j);
+    		if (((ProcessComponent) child).isLoad()&&!isInMemory(memory,child)) { // Shoul be allocated
+        		int i = 0;	
+        		MemPartition candidate = null;
+        		while (i<memOrdered.length && candidate == null) {
+            		MemPartition partition = (MemPartition) memOrdered[i];
+            		if (!candidates.contains(partition) && partition.getAllocated() == null) {
+            			candidate = partition;// First candidate
+            		}
+            		i++;
+        		}
+        		if (candidate != null) candidates.add(candidate);
+        		//else throw new SoSimException("me_08");   
+        		else {
+        			int position = OSSize + swapTimes;//int position = LRUGetPosition();
+        			this.swapOutProcess(memory, swap,(MemPartition) memOrdered[position]);	
+					candidate = (MemPartition) memOrdered[position];
+					candidates.add(candidate);
+					swapTimes++;
+					//System.out.println("There it is!!!!");
+					//throw new SoSimException("me_08");
+				}
+    		} 
+    	}
+    	
+    	// Allocate pages
+    	for (int j = 0; j < values.size(); j++) {
+    		child = values.get(j);
+    		if (((ProcessComponent) child).isLoad()&&!isInMemory(memory,child)) {
+    			MemPartition block = candidates.remove(0);
+    			block.setAllocated(child); 
+    		} else swap.add(child); // Not loaded
+    	}
     	
 	}
 	
 	
+	private boolean isInMemory(List<MemPartition> memory, ProcessMemUnit child) {
+		Iterator<MemPartition> it = memory.iterator();
+		while(it.hasNext()){
+			MemPartition m = it.next();
+			if(m.getAllocated()!=null&&m.getAllocated().equals(child)) return true;
+		}
+		return false;
+	}
+
 	public void allocateSO(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) {
 		Object[] memOrdered = memory.toArray();
     	Arrays.sort(memOrdered);

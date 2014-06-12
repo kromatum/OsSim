@@ -172,7 +172,7 @@ public interface MemStrategy {
 	 * @throws SoSimException	process can not be allocated
 	 */
 	public void allocateProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException;
-	
+	public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException;
 	/**
      * Allocates swapped process from backing store into memory. 
 	 * 
