@@ -51,7 +51,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 		memory.clear();
 		// Create a memory frames, size = page size
 		int end = 0;
-		while (end <  memory_size) {
+		while (end <  10) {
 			MemPartition b = new MemPartition(end, pageSize);
 			memory.add(b);
 			end += pageSize;
@@ -87,6 +87,23 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 			virtualmemory.add(b);
 			end += pageSize;
 		}
+//		Add SO.
+		
+			ProcessComplete so = new ProcessComplete(0, strSO, size, -1, color);
+			int pages;
+			if (size%pageSize == 0) pages = size/pageSize;
+			else pages = size/pageSize + 1;
+
+			for (int i = 0; i< pages -1 ; i++) {
+				ProcessComponent pc = new ProcessPage(so, i, pageSize, true);
+				so.addBlock(pc);
+			}
+
+			// last page. Variable size
+			ProcessComponent pc = new ProcessPage(so, pages -1, size - (pages -1)*pageSize, true);
+			so.addBlock(pc);
+
+			allocateSO(virtualmemory, null, so, 5*memory_size);
 
 	}
 	
@@ -385,11 +402,13 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     	List<ProcessComponent> values = quantumBlocks.get(key);
     	ProcessMemUnit child;
     	List<MemPartition> candidates = new LinkedList<MemPartition>();
-    	int swapTimes = 0;
     	// Checking memory frames
     	for (int j = 0; j < values.size(); j++) {
     		child = values.get(j);
+    		((ProcessComponent) child).setTime(0);
+    		addOtherTime(memory,child);
     		if (((ProcessComponent) child).isLoad()&&!isInMemory(memory,child)) { // Shoul be allocated
+    			
         		int i = 0;	
         		MemPartition candidate = null;
         		while (i<memOrdered.length && candidate == null) {
@@ -402,11 +421,10 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
         		if (candidate != null) candidates.add(candidate);
         		//else throw new SoSimException("me_08");   
         		else {
-        			int position = OSSize + swapTimes;//int position = LRUGetPosition();
+        			int position = LRUFindPosition(memory,OSSize);//int position = LRUGetPosition();
         			this.swapOutProcess(memory, swap,(MemPartition) memOrdered[position]);	
 					candidate = (MemPartition) memOrdered[position];
 					candidates.add(candidate);
-					swapTimes++;
 					//System.out.println("There it is!!!!");
 					//throw new SoSimException("me_08");
 				}
@@ -425,6 +443,28 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 	}
 	
 	
+	private int LRUFindPosition(List<MemPartition> memory,int OSSize) {
+		int max = 0;
+		int position = OSSize;
+		for(int j=OSSize;j<memory.size();j++){
+			ProcessComponent p = (ProcessComponent)memory.get(j).getAllocated();	
+			if(p!=null&&p.time>max){
+				max = p.time;
+				position = j;
+			}
+		}
+		return position;
+	}
+
+	private void addOtherTime(List<MemPartition> memory, ProcessMemUnit child) {
+		Iterator<MemPartition> it = memory.iterator();
+		while(it.hasNext()){
+			MemPartition m = it.next();
+			ProcessComponent p = (ProcessComponent)m.getAllocated();
+			if(p!=null&&!p.equals(child)) p.addTime();
+		}
+	}
+
 	private boolean isInMemory(List<MemPartition> memory, ProcessMemUnit child) {
 		Iterator<MemPartition> it = memory.iterator();
 		while(it.hasNext()){

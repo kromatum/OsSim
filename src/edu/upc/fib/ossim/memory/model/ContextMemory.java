@@ -61,7 +61,7 @@ public class ContextMemory {
         
         //	Add OS.
         algorithm.initMemory(memory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
-        algorithm.initMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, 5*memorySize);
+        algorithm.initVirtualMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
         
     }
  
@@ -106,7 +106,7 @@ public class ContextMemory {
     	this.memorySize = memorySize;
     	this.osSize = osSize;
     	algorithm.initMemory(memory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
-    	algorithm.initMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
+    	algorithm.initVirtualMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
     	processQueue.clear();
     }
 	
@@ -121,7 +121,7 @@ public class ContextMemory {
     public void setAlgorithm(MemStrategy algorithm){
     	this.algorithm = algorithm;
     	algorithm.initMemory(memory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
-    	algorithm.initMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, 5*memorySize);
+    	algorithm.initVirtualMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
     	processQueue.clear();
     }
 

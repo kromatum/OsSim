@@ -197,7 +197,8 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 				Object value = me.getValue();
 				quantumIDs = (ArrayList<Integer>)value;
 				for(int id:quantumIDs) {
-					quantumBlocks.add(blocks.get(id));
+					if(id<size) quantumBlocks.add(blocks.get(id));
+					else throw new SoSimException("me_17");
 				}
 				res.put(key, quantumBlocks);	
 			}
