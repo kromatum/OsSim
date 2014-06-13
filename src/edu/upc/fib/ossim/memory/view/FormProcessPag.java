@@ -176,7 +176,6 @@ public class FormProcessPag extends FormProcess {
 		}
 		
 		int pageNumbers = tablemodel.getRowCount();
-		System.out.println("pageNumber"+pageNumbers);
 		
 		for(int i=0;i<s.length;i++){
 			String[]order = s[i].split(",");
