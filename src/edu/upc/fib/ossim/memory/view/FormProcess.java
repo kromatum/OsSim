@@ -151,6 +151,7 @@ public class FormProcess extends FormTemplate {
 		return true;
 	}
 	
+
 	/**
 	 * Returns a vector containing form values
 	 *

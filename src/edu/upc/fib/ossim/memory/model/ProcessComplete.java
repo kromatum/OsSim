@@ -187,23 +187,19 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		Map<Integer,List<ProcessComponent>>res = new HashMap<Integer,List<ProcessComponent>>();		
 		StringToMap stm = new StringToMap(quantumOrders);
 		Map<Integer,List<Integer>>pagesOrder = stm.transformToMap();
-		if(pagesOrder.size()==quantum){
-			Set mappings = pagesOrder.entrySet();
-			for (Iterator i = mappings.iterator(); i.hasNext();) {	
-				List<ProcessComponent> quantumBlocks = new LinkedList<ProcessComponent>();
-				List<Integer>quantumIDs = new ArrayList<Integer>();
-				Map.Entry me = (Map.Entry)i.next();
-				Integer key = (Integer)me.getKey();
-				Object value = me.getValue();
-				quantumIDs = (ArrayList<Integer>)value;
-				for(int id:quantumIDs) {
-					if(id<blocks.size()) quantumBlocks.add(blocks.get(id));
-					else throw new SoSimException("me_17");
-				}
-				res.put(key, quantumBlocks);	
+		Set mappings = pagesOrder.entrySet();
+		for (Iterator i = mappings.iterator(); i.hasNext();) {	
+			List<ProcessComponent> quantumBlocks = new LinkedList<ProcessComponent>();
+			List<Integer>quantumIDs = new ArrayList<Integer>();
+			Map.Entry me = (Map.Entry)i.next();
+			Integer key = (Integer)me.getKey();
+			Object value = me.getValue();
+			quantumIDs = (ArrayList<Integer>)value;
+			for(int id:quantumIDs) {
+				quantumBlocks.add(blocks.get(id));
 			}
+			res.put(key, quantumBlocks);	
 		}	
-		else throw new SoSimException("me_16");
 		return res;
 	}
 		

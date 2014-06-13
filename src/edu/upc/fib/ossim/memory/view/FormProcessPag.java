@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.util.Vector;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -20,6 +21,7 @@ import edu.upc.fib.ossim.template.Presenter;
 import edu.upc.fib.ossim.template.view.FormTemplate;
 import edu.upc.fib.ossim.utils.AppTableModel;
 import edu.upc.fib.ossim.utils.Functions;
+import edu.upc.fib.ossim.utils.Translation;
 
 
 
@@ -69,7 +71,7 @@ public class FormProcessPag extends FormProcess {
 	@SuppressWarnings("unchecked")
 	public void initBlocks(Vector<Object> values) {
 		
-		
+		duration.setEnabled(false);
 		size.addChangeListener(presenter);	// Update page table	
 		
 		lblocks = new JLabel(blockTitle);
@@ -117,7 +119,7 @@ public class FormProcessPag extends FormProcess {
 		grid.add(new JLabel("quantum"));
 		SpinnerModel spmodel;
 		if (values.size() > 1) spmodel = new SpinnerNumberModel(new Integer(values.get(7).toString()).intValue(), 1, 4, 1);
-		else spmodel = new SpinnerNumberModel(1, 1,4, 1);
+		else spmodel = new SpinnerNumberModel(1, 1,10, 1);
 		quantum = new JSpinner(spmodel);
 		JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) quantum.getEditor();
 		editor.getTextField().addFocusListener(presenter);
@@ -158,7 +160,37 @@ public class FormProcessPag extends FormProcess {
 	 * @return true
 	 */
 	public boolean validateFieldsBlock() {
+		return validateFieldsOrder();
+	}
+	
+	public boolean validateFieldsOrder() {
+		String orders = textField.getText();
+		if ("".equals(orders) || orders == null){
+			JOptionPane.showMessageDialog(this.getParent(),Translation.getInstance().getError("all_10"),"Error",JOptionPane.ERROR_MESSAGE);
+			return false;	
+		}
+		String[] s = orders.split(";");
+		if(s.length!=((Integer) quantum.getValue()).intValue()){
+			JOptionPane.showMessageDialog(this.getParent(),Translation.getInstance().getError("all_11"),"Error",JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
+		int pageNumbers = tablemodel.getRowCount();
+		System.out.println("pageNumber"+pageNumbers);
+		
+		for(int i=0;i<s.length;i++){
+			String[]order = s[i].split(",");
+			for(int j=0;j<order.length;j++){
+				if(Integer.parseInt(order[j])<0||Integer.parseInt(order[j])>=pageNumbers){
+					JOptionPane.showMessageDialog(this.getParent(),Translation.getInstance().getError("all_12"),"Error",JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+			}
+		}
+		
+		
 		return true;
+		
 	}
 
 	/**
