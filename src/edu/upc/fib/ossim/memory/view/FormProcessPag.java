@@ -170,12 +170,14 @@ public class FormProcessPag extends FormProcess {
 			return false;	
 		}
 		int pageNumbers = tablemodel.getRowCount();
+		
 		for(int i=0;i<orders.length();i++){
-			if(orders.charAt(i)!=','||orders.charAt(i)!=';'||Integer.parseInt(orders.charAt(i)+"")<0||Integer.parseInt(orders.charAt(i)+"")>=pageNumbers){
+			if(orders.charAt(i)!=','&&orders.charAt(i)!=';'&&orders.charAt(i)<'0'){
 				JOptionPane.showMessageDialog(this.getParent(),Translation.getInstance().getError("all_13"),"Error",JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
 		}
+		
 		String[] s = orders.split(";");
 		if(s.length!=((Integer) quantum.getValue()).intValue()){
 			JOptionPane.showMessageDialog(this.getParent(),Translation.getInstance().getError("all_11"),"Error",JOptionPane.ERROR_MESSAGE);
