@@ -172,7 +172,7 @@ public class FormProcessPag extends FormProcess {
 		int pageNumbers = tablemodel.getRowCount();
 		
 		for(int i=0;i<orders.length();i++){
-			if(orders.charAt(i)!=','&&orders.charAt(i)!=';'&&orders.charAt(i)<'0'){
+			if(orders.charAt(i)!=','&&orders.charAt(i)!=';'&&(orders.charAt(i)<'0'||orders.charAt(i)>'9')){
 				JOptionPane.showMessageDialog(this.getParent(),Translation.getInstance().getError("all_13"),"Error",JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
