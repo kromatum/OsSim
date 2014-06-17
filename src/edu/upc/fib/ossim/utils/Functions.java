@@ -20,6 +20,7 @@ import edu.upc.fib.ossim.disk.DiskPresenter;
 import edu.upc.fib.ossim.filesystem.FileSystemPresenter;
 import edu.upc.fib.ossim.mcq.DiskMCQCreatorPresenter;
 import edu.upc.fib.ossim.mcq.DiskMCQViewPresenter;
+import edu.upc.fib.ossim.mcq.FileSystemMCQCreatorPresenter;
 import edu.upc.fib.ossim.mcq.MemoryMCQCreatorPresenter;
 import edu.upc.fib.ossim.mcq.MemoryMCQViewPresenter;
 import edu.upc.fib.ossim.mcq.ProcessMCQCreatorPresenter;
@@ -143,7 +144,8 @@ public class Functions {
 				!sroot.equals(getPropertyString("xml_root_mcq_pro"))  	&&
 				!sroot.equals(getPropertyString("xml_root_disk"))   &&
 				!sroot.equals(getPropertyString("xml_root_mcq_dsk"))  &&
-				!sroot.equals(getPropertyString("xml_root_mcq_mem")))
+				!sroot.equals(getPropertyString("xml_root_mcq_mem"))&&
+				!sroot.equals(getPropertyString("xml_root_mcq_fs")))
 			throw new SoSimException("all_04");
 
 		if (sroot.equals(getPropertyString("xml_root_pro"))){ 	
@@ -167,6 +169,9 @@ public class Functions {
 		if (sroot.equals(getPropertyString("xml_root_mcq_mem"))){
 			AppSession.getInstance().getApp().setMCQSize();
 			AppSession.getInstance().setPresenter(new MemoryMCQCreatorPresenter(false));}
+		if (sroot.equals(getPropertyString("xml_root_mcq_fs"))){
+			AppSession.getInstance().getApp().setMCQSize();
+			AppSession.getInstance().setPresenter(new FileSystemMCQCreatorPresenter(false));}
 		AppSession.getInstance().getPresenter().loadXML(file);	// Load file
 		AppSession.getInstance().getPresenter().updateInfo(); // Update table info
 		AppSession.getInstance().getPresenter().repaintPainters(); // Repaint painters 

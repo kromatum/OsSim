@@ -26,6 +26,7 @@ import javax.swing.KeyStroke;
 import edu.upc.fib.ossim.disk.DiskPresenter;
 import edu.upc.fib.ossim.filesystem.FileSystemPresenter;
 import edu.upc.fib.ossim.mcq.DiskMCQCreatorPresenter;
+import edu.upc.fib.ossim.mcq.FileSystemMCQCreatorPresenter;
 import edu.upc.fib.ossim.mcq.MCQSession;
 import edu.upc.fib.ossim.mcq.MediumPanel;
 import edu.upc.fib.ossim.mcq.MemoryMCQCreatorPresenter;
@@ -481,9 +482,9 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 				MCQSession.getInstance().hideMediumPanel();
 				AppSession.getInstance().getApp().setMCQSize();
 				if (AppSession.getInstance().getPresenter() != null)  AppSession.getInstance().getPresenter().closeInfo();
-				AppSession.getInstance().setPresenter(new FileSystemPresenter(true));
+				AppSession.getInstance().setPresenter(new FileSystemMCQCreatorPresenter(true));
 				
-				
+				break;
 			case 55 : // Process MCQ
 				MCQSession.getInstance().hideMediumPanel();
 				AppSession.getInstance().getApp().setMCQSize();
