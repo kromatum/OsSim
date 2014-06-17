@@ -1,12 +1,18 @@
 package edu.upc.fib.ossim.memory.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import edu.upc.fib.ossim.utils.ColorCell;
+import edu.upc.fib.ossim.utils.SoSimException;
+import edu.upc.fib.ossim.utils.StringToMap;
 
 /**
  * Process definition  (Memory management context), instance are cloneable to clone them. 
@@ -28,6 +34,11 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	private int duration;	// -1 infinite
 	private Color color;
 	private List<ProcessComponent> blocks;
+
+	int key;
+	private int quantum;
+	private String quantumOrders;
+	
 	
 	/** 
 	 * Constructs a process
@@ -47,6 +58,10 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		this.blocks = new LinkedList<ProcessComponent>();
 		if (pid == 0) maxpid = 1; // Restart pid   
 		else maxpid++;
+		this.quantum = 1;
+		this.key = 0;
+		this.quantumOrders = "";
+		
 	}
 
 	/**
@@ -113,6 +128,26 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	public Color getColor() {
 		return color;
 	}
+	
+	public int getQuantum() {
+		return quantum;
+	}
+	
+	public void setQuantum(int quantum) {
+		this.quantum = quantum;
+	}
+	
+	
+	public int getUpdatedKey() {
+		if (key < quantum) {
+			key++;
+		}
+		return key-1;
+	}
+	
+	public boolean isDone(){
+		return key==quantum;
+	}
 
 	/**
 	 * Gets unique process identifier
@@ -132,11 +167,11 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		blocks.add(block);
 	}
 	
+	
 	public void initBlocks() {
 		blocks = new LinkedList<ProcessComponent>();
 	}
 
-	
 	/**
 	 * Gets total number of component
 	 * 
@@ -145,7 +180,41 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	public int getNumBlocks() {
 		return blocks.size();
 	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public Map<Integer,List<ProcessComponent>> getQuantumBlocks() throws SoSimException{
+		Map<Integer,List<ProcessComponent>>res = new HashMap<Integer,List<ProcessComponent>>();		
+		StringToMap stm = new StringToMap(quantumOrders);
+		Map<Integer,List<Integer>>pagesOrder = stm.transformToMap();
+		Set mappings = pagesOrder.entrySet();
+		for (Iterator i = mappings.iterator(); i.hasNext();) {	
+			List<ProcessComponent> quantumBlocks = new LinkedList<ProcessComponent>();
+			List<Integer>quantumIDs = new ArrayList<Integer>();
+			Map.Entry me = (Map.Entry)i.next();
+			Integer key = (Integer)me.getKey();
+			Object value = me.getValue();
+			quantumIDs = (ArrayList<Integer>)value;
+			for(int id:quantumIDs) {
+				quantumBlocks.add(blocks.get(id));
+			}
+			res.put(key, quantumBlocks);	
+		}	
+		return res;
+	}
+		
+	
+	
 
+	public void setQuantumOrders(String quantumOrders){
+		this.quantumOrders = quantumOrders;
+	}
+	public String getQuantumOrders(){
+		return this.quantumOrders;
+	}
+	public String initQuantumOrders(){
+		return "";
+	}
 	/**
 	 * Gets component at position i of components list
 	 * 
@@ -155,6 +224,7 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 	public ProcessComponent getBlock(int i) {
 		return blocks.get(i);
 	}
+	
 	
 	/**
 	 * Returns process information table row, cells are ColorCell instances, 
@@ -174,6 +244,7 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		else info.add(new ColorCell(new Integer(duration).toString(), Color.WHITE));
 		return info;
 	}
+	
 	
 	/**
 	 * Returns process xml information, pairs attribute name - attribute value, 
@@ -227,6 +298,7 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 			clone = (ProcessComplete) super.clone();
 			
 			clone.initBlocks();
+			clone.initQuantumOrders();
 			
 			// Must clone all blocks one by one
 			Iterator<ProcessComponent> it = blocks.iterator();
@@ -235,10 +307,12 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 				clonedBlock.setParent(clone);
 				clone.addBlock(clonedBlock);
 			}
+			clone.setQuantumOrders(quantumOrders);
 			
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 		}
 	    return clone;
 	}
+	
 }

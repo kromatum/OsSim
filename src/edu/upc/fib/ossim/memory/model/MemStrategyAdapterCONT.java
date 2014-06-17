@@ -67,7 +67,8 @@ public abstract class MemStrategyAdapterCONT implements MemStrategy {
 			e.printStackTrace();
 		}
 	}
-	
+	public void initVirtualMemory(List<MemPartition> virtualmemory, String label,
+			int osSize, Color lightgray, int memorySize){}
 	/**
 	 * Returns initial algorithm partition size
 	 * 
@@ -125,6 +126,9 @@ public abstract class MemStrategyAdapterCONT implements MemStrategy {
 	public Vector<Vector<Object>> getProcessComponentsData(ProcessMemUnit process) {
 		return null;
 	}
+	public Object getQuantumListData(ProcessMemUnit process){
+		return null;
+	}
 	
 	/**
 	 * Returns memory occupation table header: address, partition size, pid, name, process size, duration  
@@ -173,7 +177,6 @@ public abstract class MemStrategyAdapterCONT implements MemStrategy {
 	public Vector<Object> getFormTableHeader() {
 		return null;
 	}
-	
 	/**
 	 * Returns null. There is no component data in this strategy  
 	 * 
@@ -213,6 +216,13 @@ public abstract class MemStrategyAdapterCONT implements MemStrategy {
 	 */
 	public void addProcessComponents(ProcessComplete p,  Vector<Vector<Object>> d) {
 		// Do nothing
+	}
+	
+	public void addQuantumListData(ProcessComplete p,  Object d) {
+		//Do nothing
+	}
+	public void addQuantum(ProcessComplete p,  Object d){
+		//Do nothing
 	}
 	
 	/**
@@ -283,7 +293,10 @@ public abstract class MemStrategyAdapterCONT implements MemStrategy {
 		if (candidate != null) allocateCandidate(memory, candidate, allocate);
 		else throw new SoSimException("me_08");
 	}
-
+	public void allocateVirtualProcess(List<MemPartition> virtualmemory,
+			List<ProcessMemUnit> swap, ProcessMemUnit processMemUnit, int i){};
+	
+	public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException {}
 	protected abstract void allocateCandidate(List<MemPartition> memory, MemPartition candidate, ProcessMemUnit allocate);
 	
 	/**
@@ -342,4 +355,5 @@ public abstract class MemStrategyAdapterCONT implements MemStrategy {
 		// logicalAddr belongs to process logical space
 		return "@" + new Integer(b.getStart() + logicalAddr).toString();
 	}
+	
 }

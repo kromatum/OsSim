@@ -56,6 +56,9 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
 			e.printStackTrace();
 		}
 	}
+	
+	public void initVirtualMemory(List<MemPartition> virtualmemory, String label,
+			int osSize, Color lightgray, int memorySize){}
 
 	/**
 	 * Returns segment description: code, stack or data  
@@ -107,7 +110,9 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
 		}
 		return data;
 	}
-
+	public Object getOrderListData(ProcessMemUnit process){
+		return null;
+	}
 	/**
 	 * Returns memory occupation table header: address, segment size, segment description, pid, name, process size, duration  
 	 * 
@@ -160,7 +165,7 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
     	header.add(Translation.getInstance().getLabel("me_76"));
 		return header;
 	}
-
+	
 	/**
 	 * Returns process form table initial data. Any process has 3 segments: code, data and stack, 
 	 * initially every segment would be load into memory and its size is 1 kb   
@@ -186,7 +191,6 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
     	data.add(row2);
 		return data;
 	}
-	
 	/**
 	 * Returns process allocation tables header, process' segments information: segment description, size, 
 	 * start memory address and a valid field that indicates if segment is load or it is in the backing store  
@@ -256,6 +260,16 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
 			ProcessComponent pc = new ProcessSegment(p, i, (Integer) data.elementAt(1), (Boolean) data.elementAt(2));
 			p.addBlock(pc);
 		}
+	}
+	
+	public Object getQuantumListData(ProcessMemUnit process){
+		return null;
+	}
+	public void addQuantumListData(ProcessComplete p,  Object d) {
+		//Do nothing
+	}
+	public void addQuantum(ProcessComplete p,  Object d){
+		//Do nothing
 	}
 
 	/**
@@ -357,6 +371,11 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
     		} else swap.add(child); // Not loaded
     	}
 	}
+	public void allocateVirtualProcess(List<MemPartition> virtualmemory,
+			List<ProcessMemUnit> swap, ProcessMemUnit processMemUnit, int i){}
+public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, 
+		ProcessMemUnit allocate, int memory_size) throws SoSimException {}
+
 	
 	/**
      * Allocates swapped process segment from backing store into memory 

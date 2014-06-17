@@ -66,4 +66,5 @@ public class ProcessSegment extends ProcessComponent {
 		info.add(1, new ColorCell(getKey(bid), Color.WHITE));
 		return info;
 	}
+	
 }
