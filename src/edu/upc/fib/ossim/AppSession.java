@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Observable;
 import java.util.Properties;
 
+import edu.upc.fib.ossim.mcq.MCQSession;
 import edu.upc.fib.ossim.template.Presenter;
 import edu.upc.fib.ossim.utils.ObservableIdioma;
 
