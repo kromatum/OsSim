@@ -37,4 +37,12 @@ public interface OSSim {
 	 * @return it is possible to open or save simultions
 	 */
 	public boolean allowOpenSave();
+	/**
+	 * Extends the default Size to fit the MCQ Panel
+	 */
+	public void setMCQSize();
+	/**
+	 * Reverts back to the default Size
+	 */
+	public void setDefaultSize();
 }

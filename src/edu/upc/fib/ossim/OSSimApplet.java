@@ -107,4 +107,16 @@ public class OSSimApplet extends JApplet implements OSSim {
 	public boolean allowOpenSave() {
 		return false;
 	}
+
+	@Override
+	public void setMCQSize() {
+		this.setSize(1100,600);
+		this.repaint();
+	}
+
+	@Override
+	public void setDefaultSize() {
+		this.setSize(800,600);
+		this.repaint();
+	}
 }
