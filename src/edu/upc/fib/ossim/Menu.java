@@ -20,19 +20,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import edu.upc.fib.ossim.ProcessQCM.ProcessQCMPresenter;
 import edu.upc.fib.ossim.disk.DiskPresenter;
 import edu.upc.fib.ossim.filesystem.FileSystemPresenter;
 import edu.upc.fib.ossim.memory.MemoryPresenter;
 import edu.upc.fib.ossim.process.ProcessPresenter;
-import edu.upc.fib.ossim.qcmcreator.QCMcreatorPresenter;
-import edu.upc.fib.ossim.qcmloader.QCMloaderPresenter;
 import edu.upc.fib.ossim.utils.Functions;
 import edu.upc.fib.ossim.utils.HelpDialog;
 import edu.upc.fib.ossim.utils.OpenSaveDialog;
 import edu.upc.fib.ossim.utils.SoSimException;
 import edu.upc.fib.ossim.utils.Translation;
-
 
 /**
  * Application menu:
@@ -42,20 +38,20 @@ import edu.upc.fib.ossim.utils.Translation;
  * <li>Memory: opens memory management simulation</li>
  * <li>Files: opens file system management simulation</li>
  * <li>Disk: opens disk scheduling simulation</li>
- * <li>Help: opens main application help and about panel</li>   
- * </ul> 
+ * <li>Help: opens main application help and about panel</li>
+ * </ul>
  * <br/>
- * Menu also manages its own action events and observes language changes    
+ * Menu also manages its own action events and observes language changes
  * 
  * @author Àlex
  */
-public class Menu extends JMenuBar implements ActionListener, Observer { 
+public class Menu extends JMenuBar implements ActionListener, Observer {
 	private static final long serialVersionUID = 1L;
 	private static final int HELP_WIDTH = 600;
 	private static final int HELP_HEIGHT = 350;
 
-	private JMenu fileMenu = null; 
-	private JMenu processMenu = null; 
+	private JMenu fileMenu = null;
+	private JMenu processMenu = null;
 	private JMenu memoryMenu = null;
 	private JMenu diskMenu = null;
 	private JMenu filesMenu = null;
@@ -66,7 +62,7 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 	private JButton bca;
 	private JButton bes;
 
-	private JMenuItem exitMenuItem = null; 
+	private JMenuItem exitMenuItem = null;
 	private JMenuItem openMenuItem = null;
 	private JMenuItem saveMenuItem = null;
 	private JMenuItem homeMenuItem = null;
@@ -89,21 +85,18 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 	private JMenuItem exercisesFs = null;
 	private JMenuItem exercisesDisk = null;
 
-
 	private JMenuItem aboutMenuItem = null;
-
-
 
 	private Hashtable<String, Integer> actions;
 
 	/**
 	 * Constructs menu, initialize menu components and maps menu actions.
 	 */
-	public Menu() { 
+	public Menu() {
 		AppSession.getInstance().getLangNotifier().addObserver(this);
 		mapActions();
-		initialize(); 
-	} 
+		initialize();
+	}
 
 	private void mapActions() {
 		actions = new Hashtable<String, Integer>(); // map actions from events
@@ -121,7 +114,7 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 		actions.put("mngd", 40);
 		actions.put("fls", 50);
 		actions.put("qcmc", 51);
-		actions.put("qcml",52);
+		actions.put("qcml", 52);
 		actions.put("samplesSch", 60);
 		actions.put("samplesMem", 61);
 		actions.put("samplesFs", 62);
@@ -132,192 +125,211 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 		actions.put("exercisesDisk", 73);
 	}
 
-	private void initialize() { 
+	private void initialize() {
 		fileMenu = new JMenu();
 		fileMenu.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-		fileMenu.setText(Translation.getInstance().getLabel("all_50")); 
-		fileMenu.setMnemonic(Translation.getInstance().getLabel("all_20").charAt(0));
+		fileMenu.setText(Translation.getInstance().getLabel("all_50"));
+		fileMenu.setMnemonic(Translation.getInstance().getLabel("all_20")
+				.charAt(0));
 		exitMenuItem = new JMenuItem();
 		exitMenuItem.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-		exitMenuItem.setText(Translation.getInstance().getLabel("all_51")); 
+		exitMenuItem.setText(Translation.getInstance().getLabel("all_51"));
 		exitMenuItem.setActionCommand("exit");
-		exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
-		exitMenuItem.addActionListener(this); 
-		fileMenu.add(exitMenuItem); 
+		exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E,
+				ActionEvent.CTRL_MASK));
+		exitMenuItem.addActionListener(this);
+		fileMenu.add(exitMenuItem);
 
-		openMenuItem = new JMenuItem(); 
+		openMenuItem = new JMenuItem();
 		openMenuItem.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-		openMenuItem.setText(Translation.getInstance().getLabel("all_12")); // Open simulation 
+		openMenuItem.setText(Translation.getInstance().getLabel("all_12")); // Open
+																			// simulation
 		openMenuItem.setActionCommand("open");
-		openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-		if (!AppSession.getInstance().getApp().allowOpenSave()) openMenuItem.setEnabled(false);
-		openMenuItem.addActionListener(this); 
-		fileMenu.add(openMenuItem); 
+		openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
+				ActionEvent.CTRL_MASK));
+		if (!AppSession.getInstance().getApp().allowOpenSave())
+			openMenuItem.setEnabled(false);
+		openMenuItem.addActionListener(this);
+		fileMenu.add(openMenuItem);
 
-		saveMenuItem = new JMenuItem(); 
+		saveMenuItem = new JMenuItem();
 		saveMenuItem.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-		saveMenuItem.setText(Translation.getInstance().getLabel("all_13")); // Save simulation 
+		saveMenuItem.setText(Translation.getInstance().getLabel("all_13")); // Save
+																			// simulation
 		saveMenuItem.setActionCommand("save");
-		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+				ActionEvent.CTRL_MASK));
 		saveMenuItem.addActionListener(this);
 		saveMenuItem.setEnabled(false); // Disabled until opening any simulation
-		fileMenu.add(saveMenuItem); 
+		fileMenu.add(saveMenuItem);
 
-		homeMenuItem = new JMenuItem(); 
+		homeMenuItem = new JMenuItem();
 		homeMenuItem.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-		homeMenuItem.setText(Translation.getInstance().getLabel("all_14")); 
+		homeMenuItem.setText(Translation.getInstance().getLabel("all_14"));
 		homeMenuItem.setActionCommand("home");
 		homeMenuItem.addActionListener(this);
-		fileMenu.add(homeMenuItem); 
+		fileMenu.add(homeMenuItem);
 
-		this.add(fileMenu); 
+		this.add(fileMenu);
 
-		processMenu = new JMenu(); 
+		processMenu = new JMenu();
 		processMenu.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-		processMenu.setText(Translation.getInstance().getLabel("all_52")); 
-		processMenu.setMnemonic(Translation.getInstance().getLabel("all_24").charAt(0));
+		processMenu.setText(Translation.getInstance().getLabel("all_52"));
+		processMenu.setMnemonic(Translation.getInstance().getLabel("all_24")
+				.charAt(0));
 		simProcsMenuItem = new JMenuItem();
 		simProcsMenuItem.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
 		simProcsMenuItem.setText(Translation.getInstance().getLabel("all_53"));
 		simProcsMenuItem.setActionCommand("sch");
-		simProcsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
-		simProcsMenuItem.addActionListener(this); 
-		processMenu.add(simProcsMenuItem); 
+		simProcsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P,
+				ActionEvent.CTRL_MASK));
+		simProcsMenuItem.addActionListener(this);
+		processMenu.add(simProcsMenuItem);
 		this.add(processMenu);
 
-		memoryMenu = new JMenu(); 
+		memoryMenu = new JMenu();
 		memoryMenu.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-		memoryMenu.setText(Translation.getInstance().getLabel("all_54")); 
-		memoryMenu.setMnemonic(Translation.getInstance().getLabel("all_26").charAt(0));
-		simMemMenuItem = new JMenuItem(); 
+		memoryMenu.setText(Translation.getInstance().getLabel("all_54"));
+		memoryMenu.setMnemonic(Translation.getInstance().getLabel("all_26")
+				.charAt(0));
+		simMemMenuItem = new JMenuItem();
 		simMemMenuItem.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
 		simMemMenuItem.setText(Translation.getInstance().getLabel("all_55"));
 		simMemMenuItem.setActionCommand("mngc");
-		simMemMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, ActionEvent.CTRL_MASK));
-		simMemMenuItem.addActionListener(this); 
-		memoryMenu.add(simMemMenuItem); 
+		simMemMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M,
+				ActionEvent.CTRL_MASK));
+		simMemMenuItem.addActionListener(this);
+		memoryMenu.add(simMemMenuItem);
 
 		this.add(memoryMenu);
 
-		filesMenu = new JMenu(); 
+		filesMenu = new JMenu();
 		filesMenu.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-		filesMenu.setText(Translation.getInstance().getLabel("all_58")); 
-		filesMenu.setMnemonic(Translation.getInstance().getLabel("all_30").charAt(0));
-		simFilesMenuItem = new JMenuItem(); 
+		filesMenu.setText(Translation.getInstance().getLabel("all_58"));
+		filesMenu.setMnemonic(Translation.getInstance().getLabel("all_30")
+				.charAt(0));
+		simFilesMenuItem = new JMenuItem();
 		simFilesMenuItem.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
 		simFilesMenuItem.setText(Translation.getInstance().getLabel("all_59"));
 		simFilesMenuItem.setActionCommand("fls");
-		simFilesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionEvent.CTRL_MASK));
-		simFilesMenuItem.addActionListener(this); 
-		filesMenu.add(simFilesMenuItem); 
+		simFilesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I,
+				ActionEvent.CTRL_MASK));
+		simFilesMenuItem.addActionListener(this);
+		filesMenu.add(simFilesMenuItem);
 		this.add(filesMenu);
 
-		diskMenu = new JMenu(); 
+		diskMenu = new JMenu();
 		diskMenu.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-		diskMenu.setText(Translation.getInstance().getLabel("all_56")); 
-		diskMenu.setMnemonic(Translation.getInstance().getLabel("all_28").charAt(0));
-		simdiskMngMenuItem = new JMenuItem(); 
+		diskMenu.setText(Translation.getInstance().getLabel("all_56"));
+		diskMenu.setMnemonic(Translation.getInstance().getLabel("all_28")
+				.charAt(0));
+		simdiskMngMenuItem = new JMenuItem();
 		simdiskMngMenuItem.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-		simdiskMngMenuItem.setText(Translation.getInstance().getLabel("all_57"));
+		simdiskMngMenuItem
+				.setText(Translation.getInstance().getLabel("all_57"));
 		simdiskMngMenuItem.setActionCommand("mngd");
-		simdiskMngMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
-		simdiskMngMenuItem.addActionListener(this); 
-		diskMenu.add(simdiskMngMenuItem); 
+		simdiskMngMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D,
+				ActionEvent.CTRL_MASK));
+		simdiskMngMenuItem.addActionListener(this);
+		diskMenu.add(simdiskMngMenuItem);
 
 		this.add(diskMenu);
 
-		helpMenu = new JMenu(); 
+		helpMenu = new JMenu();
 		helpMenu.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
 		helpMenu.setText(Translation.getInstance().getLabel("all_61"));
-		helpMenu.setMnemonic(Translation.getInstance().getLabel("all_33").charAt(0));
-		helpMenuItem = new JMenuItem(); 
+		helpMenu.setMnemonic(Translation.getInstance().getLabel("all_33")
+				.charAt(0));
+		helpMenuItem = new JMenuItem();
 		helpMenuItem.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
 		helpMenuItem.setText(Translation.getInstance().getLabel("all_61"));
 		helpMenuItem.setAccelerator(KeyStroke.getKeyStroke("F1"));
 		helpMenuItem.setActionCommand("help");
-		helpMenuItem.addActionListener(this); 
-		helpMenu.add(helpMenuItem); 
+		helpMenuItem.addActionListener(this);
+		helpMenu.add(helpMenuItem);
 
 		// Submenu samples
 		samplesMenu = new JMenu();
-		samplesMenu.setFont(new Font(Font.SANS_SERIF, Font.ITALIC + Font.BOLD, 12));
+		samplesMenu.setFont(new Font(Font.SANS_SERIF, Font.ITALIC + Font.BOLD,
+				12));
 		samplesMenu.setText(Translation.getInstance().getLabel("all_62"));
 
 		samplesSch = new JMenuItem();
-		samplesSch.setFont(new Font(Font.SANS_SERIF,Font.PLAIN, 12));
+		samplesSch.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
 		samplesSch.setText(Translation.getInstance().getLabel("all_53"));
 		samplesSch.setActionCommand("samplesSch");
-		samplesSch.addActionListener(this); 
+		samplesSch.addActionListener(this);
 		samplesMenu.add(samplesSch);
 
 		samplesMem = new JMenuItem();
-		samplesMem.setFont(new Font(Font.SANS_SERIF,Font.PLAIN, 12));
+		samplesMem.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
 		samplesMem.setText(Translation.getInstance().getLabel("all_55"));
 		samplesMem.setActionCommand("samplesMem");
-		samplesMem.addActionListener(this); 
+		samplesMem.addActionListener(this);
 		samplesMenu.add(samplesMem);
 
 		samplesFs = new JMenuItem();
-		samplesFs.setFont(new Font(Font.SANS_SERIF,Font.PLAIN, 12));
+		samplesFs.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
 		samplesFs.setText(Translation.getInstance().getLabel("all_59"));
 		samplesFs.setActionCommand("samplesFs");
-		samplesFs.addActionListener(this); 
+		samplesFs.addActionListener(this);
 		samplesMenu.add(samplesFs);
 
 		samplesDisk = new JMenuItem();
-		samplesDisk.setFont(new Font(Font.SANS_SERIF,Font.PLAIN, 12));
+		samplesDisk.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
 		samplesDisk.setText(Translation.getInstance().getLabel("all_57"));
 		samplesDisk.setActionCommand("samplesDisk");
-		samplesDisk.addActionListener(this); 
+		samplesDisk.addActionListener(this);
 		samplesMenu.add(samplesDisk);
 
-		helpMenu.add(samplesMenu); 
+		helpMenu.add(samplesMenu);
 
 		// Submenu exercises
-		exercisesMenu = new JMenu(); 
-		exercisesMenu.setFont(new Font(Font.SANS_SERIF, Font.ITALIC + Font.BOLD, 12));
+		exercisesMenu = new JMenu();
+		exercisesMenu.setFont(new Font(Font.SANS_SERIF,
+				Font.ITALIC + Font.BOLD, 12));
 		exercisesMenu.setText(Translation.getInstance().getLabel("all_63"));
 
 		exercisesSch = new JMenuItem();
-		exercisesSch.setFont(new Font(Font.SANS_SERIF,Font.PLAIN, 12));
+		exercisesSch.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
 		exercisesSch.setText(Translation.getInstance().getLabel("all_53"));
 		exercisesSch.setActionCommand("exercisesSch");
-		exercisesSch.addActionListener(this); 
+		exercisesSch.addActionListener(this);
 		exercisesMenu.add(exercisesSch);
 
 		exercisesMem = new JMenuItem();
-		exercisesMem.setFont(new Font(Font.SANS_SERIF,Font.PLAIN, 12));
+		exercisesMem.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
 		exercisesMem.setText(Translation.getInstance().getLabel("all_55"));
 		exercisesMem.setActionCommand("exercisesMem");
-		exercisesMem.addActionListener(this); 
+		exercisesMem.addActionListener(this);
 		exercisesMenu.add(exercisesMem);
 
 		exercisesFs = new JMenuItem();
-		exercisesFs.setFont(new Font(Font.SANS_SERIF,Font.PLAIN, 12));
+		exercisesFs.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
 		exercisesFs.setText(Translation.getInstance().getLabel("all_59"));
 		exercisesFs.setActionCommand("exercisesFs");
-		exercisesFs.addActionListener(this); 
+		exercisesFs.addActionListener(this);
 		exercisesMenu.add(exercisesFs);
 
 		exercisesDisk = new JMenuItem();
-		exercisesDisk.setFont(new Font(Font.SANS_SERIF,Font.PLAIN, 12));
+		exercisesDisk.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
 		exercisesDisk.setText(Translation.getInstance().getLabel("all_57"));
 		exercisesDisk.setActionCommand("exercisesDisk");
-		exercisesDisk.addActionListener(this); 
+		exercisesDisk.addActionListener(this);
 		exercisesMenu.add(exercisesDisk);
 
-
-		helpMenu.add(exercisesMenu); 
+		helpMenu.add(exercisesMenu);
 
 		helpMenu.addSeparator();
-		aboutMenuItem = new JMenuItem(); 
+		aboutMenuItem = new JMenuItem();
 		aboutMenuItem.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
 		aboutMenuItem.setText(Translation.getInstance().getLabel("all_60"));
-		aboutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
+		aboutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,
+				ActionEvent.CTRL_MASK));
 		aboutMenuItem.setActionCommand("about");
-		aboutMenuItem.addActionListener(this); 
-		helpMenu.add(aboutMenuItem); 
-		this.add(helpMenu); 
+		aboutMenuItem.addActionListener(this);
+		helpMenu.add(aboutMenuItem);
+		this.add(helpMenu);
 
 		this.add(Box.createHorizontalGlue());
 		lang = new JLabel(AppSession.getInstance().getIdioma().getLanguage());
@@ -325,7 +337,7 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 		this.add(new JLabel(" "));
 
 		ben = new JButton(Functions.getInstance().createImageIcon("en.gif"));
-		ben.setPreferredSize(new Dimension(22,15));
+		ben.setPreferredSize(new Dimension(22, 15));
 		ben.setActionCommand("en");
 		ben.addActionListener(this);
 		this.add(ben);
@@ -333,178 +345,224 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 		this.add(new JLabel(" "));
 
 		bca = new JButton(Functions.getInstance().createImageIcon("ca.gif"));
-		bca.setPreferredSize(new Dimension(22,15));
+		bca.setPreferredSize(new Dimension(22, 15));
 		bca.setActionCommand("ca");
 		bca.addActionListener(this);
 		this.add(bca);
 		this.add(new JLabel(" "));
 
 		bes = new JButton(Functions.getInstance().createImageIcon("es.gif"));
-		bes.setPreferredSize(new Dimension(22,15));
+		bes.setPreferredSize(new Dimension(22, 15));
 		bes.setActionCommand("es");
 		bes.addActionListener(this);
 		this.add(bes);
 		this.add(new JLabel(" "));
-	} 
+	}
 
 	/**
 	 * Manage events generated by menu items<br/>
 	 * 
-	 * @param e	action event
+	 * @param e
+	 *            action event
 	 */
 	public void actionPerformed(ActionEvent e) {
 		String scroll = "";
 		int action = actions.get(e.getActionCommand()).intValue();
 		// The first confirm accion
 		boolean doIt = true;
-		if (action == 1 || 
-				(AppSession.getInstance().getPresenter() != null  && (action == 2 || action == 4 || action >= 20))) {
-			if (JOptionPane.OK_OPTION != JOptionPane.showConfirmDialog(AppSession.getInstance().getApp().getComponent(), Translation.getInstance().getError("all_08"), "Warning", JOptionPane.OK_CANCEL_OPTION)) {
-				doIt = false;	
+		if (action == 1
+				|| (AppSession.getInstance().getPresenter() != null && (action == 2
+						|| action == 4 || action >= 20))) {
+			if (JOptionPane.OK_OPTION != JOptionPane.showConfirmDialog(
+					AppSession.getInstance().getApp().getComponent(),
+					Translation.getInstance().getError("all_08"), "Warning",
+					JOptionPane.OK_CANCEL_OPTION)) {
+				doIt = false;
 			}
 		}
 		if (doIt) {
 			switch (action) {
-			case 1:	// exit 
+			case 1: // exit
 				System.exit(0);
 				break;
-			case 2:	// open
-				OpenSaveDialog open = new OpenSaveDialog(AppSession.getInstance().getApp().getComponent());
+			case 2: // open
+				OpenSaveDialog open = new OpenSaveDialog(AppSession
+						.getInstance().getApp().getComponent());
 				File returnFile = open.showOpenFileChooser();
-				if (returnFile != null) { 
+				if (returnFile != null) {
 					// Load's document root
 					try {
-						Functions.getInstance().openSimulation(returnFile.toURI().toURL());
+						Functions.getInstance().openSimulation(
+								returnFile.toURI().toURL());
 					} catch (SoSimException ex) {
-						JOptionPane.showMessageDialog(AppSession.getInstance().getApp().getComponent(),ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(AppSession.getInstance()
+								.getApp().getComponent(), ex.getMessage(),
+								"Error", JOptionPane.ERROR_MESSAGE);
 					} catch (Exception ex) {
 						ex.printStackTrace();
-						JOptionPane.showMessageDialog(AppSession.getInstance().getApp().getComponent(),ex.toString(),"Error",JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(AppSession.getInstance()
+								.getApp().getComponent(), ex.toString(),
+								"Error", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 				break;
-			case 3:	// save
-				if (AppSession.getInstance().getPresenter() != null) AppSession.getInstance().getPresenter().actionPerformed(e);
+			case 3: // save
+				if (AppSession.getInstance().getPresenter() != null)
+					AppSession.getInstance().getPresenter().actionPerformed(e);
 				break;
-			case 4:	// home
-				if (AppSession.getInstance().getPresenter() != null)  AppSession.getInstance().getPresenter().closeInfo();
+			case 4: // home
+				if (AppSession.getInstance().getPresenter() != null)
+					AppSession.getInstance().getPresenter().closeInfo();
 				AppSession.getInstance().setPresenter(null);
 				saveMenuItem.setEnabled(false);
 				AppSession.getInstance().getApp().loadView(new Home(this));
 				break;
-			case 5:	// about
-				AppSession.getInstance().getApp().showMessage("<html>OS Sim v1.2<br/> Operating System Concepts Simulator<br/>Freely available for all uses under BSD license<br/>Alex Macia</html>");
+			case 5: // about
+				AppSession
+						.getInstance()
+						.getApp()
+						.showMessage(
+								"<html>OS Sim v1.2<br/> Operating System Concepts Simulator<br/>Freely available for all uses under BSD license<br/>Alex Macia</html>");
 				break;
-			case 6:	// help
-				HelpDialog helpPanel = new HelpDialog(AppSession.getInstance().getApp().getComponent(), "all_61", Functions.getInstance().getPropertyString("help_file"), "index", HELP_WIDTH, HELP_HEIGHT);
+			case 6: // help
+				HelpDialog helpPanel = new HelpDialog(AppSession.getInstance()
+						.getApp().getComponent(), "all_61", Functions
+						.getInstance().getPropertyString("help_file"), "index",
+						HELP_WIDTH, HELP_HEIGHT);
 				helpPanel.setVisible(false);
 				helpPanel.scrollToKey("index");
 				break;
 
-				// Language	
+			// Language
 
-			case 10:	// en
-			case 11:	// ca
-			case 12:	// es
-				ben.setVisible(action!=10);
-				bca.setVisible(action!=11);
-				bes.setVisible(action!=12);
+			case 10: // en
+			case 11: // ca
+			case 12: // es
+				ben.setVisible(action != 10);
+				bca.setVisible(action != 11);
+				bes.setVisible(action != 12);
 
-				AppSession.getInstance().setIdioma(new Locale(e.getActionCommand()));
+				AppSession.getInstance().setIdioma(
+						new Locale(e.getActionCommand()));
 				lang.setText(AppSession.getInstance().getIdioma().getLanguage());
 				Translation.getInstance().setLanguage();
 				AppSession.getInstance().getLangNotifier().notifyObservers();
-				break;	
-
-				// Simulations
-
-			case 20:	// Scheduler
-				if (AppSession.getInstance().getPresenter() != null)  AppSession.getInstance().getPresenter().closeInfo();
-				AppSession.getInstance().setPresenter(new ProcessPresenter(true));
-				break;	
-			case 30:	// Memory 
-				if (AppSession.getInstance().getPresenter() != null)  AppSession.getInstance().getPresenter().closeInfo();
-				AppSession.getInstance().setPresenter(new MemoryPresenter(true));
-				break;	
-			case 40:	// Disk
-				if (AppSession.getInstance().getPresenter() != null)  AppSession.getInstance().getPresenter().closeInfo();
-				AppSession.getInstance().setPresenter(new DiskPresenter(true));
-				break;	
-			case 50:	// File system
-				if (AppSession.getInstance().getPresenter() != null)  AppSession.getInstance().getPresenter().closeInfo();
-				AppSession.getInstance().setPresenter(new FileSystemPresenter(true));
-				break;	
-			case 51 : // QCM Creation
-				if (AppSession.getInstance().getPresenter() != null)  AppSession.getInstance().getPresenter().closeInfo();
-				AppSession.getInstance().setPresenter(new ProcessQCMPresenter(true));
-				break;	
-			case 52 : //QCM loading
-				if (AppSession.getInstance().getPresenter() != null)  AppSession.getInstance().getPresenter().closeInfo();
-				AppSession.getInstance().setPresenter(new QCMloaderPresenter(true));
 				break;
-			case 60:	// samples
+
+			// Simulations
+
+			case 20: // Scheduler
+				if (AppSession.getInstance().getPresenter() != null)
+					AppSession.getInstance().getPresenter().closeInfo();
+				AppSession.getInstance().setPresenter(
+						new ProcessPresenter(true));
+				break;
+			case 30: // Memory
+				if (AppSession.getInstance().getPresenter() != null)
+					AppSession.getInstance().getPresenter().closeInfo();
+				AppSession.getInstance()
+						.setPresenter(new MemoryPresenter(true));
+				break;
+			case 40: // Disk
+				if (AppSession.getInstance().getPresenter() != null)
+					AppSession.getInstance().getPresenter().closeInfo();
+				AppSession.getInstance().setPresenter(new DiskPresenter(true));
+				break;
+			case 50: // File system
+				if (AppSession.getInstance().getPresenter() != null)
+					AppSession.getInstance().getPresenter().closeInfo();
+				AppSession.getInstance().setPresenter(
+						new FileSystemPresenter(true));
+				break;
+			case 60: // samples
 			case 61:
 			case 62:
 			case 63:
 
-				if (action == 60) scroll = "scheduling_examples";
-				if (action == 61) scroll = "memory_examples";
-				if (action == 62) scroll = "filesystem_examples";
-				if (action == 63) scroll = "disk_examples";
+				if (action == 60)
+					scroll = "scheduling_examples";
+				if (action == 61)
+					scroll = "memory_examples";
+				if (action == 62)
+					scroll = "filesystem_examples";
+				if (action == 63)
+					scroll = "disk_examples";
 
-				HelpDialog samplesPanel = new HelpDialog(AppSession.getInstance().getApp().getComponent(), "all_61", Functions.getInstance().getPropertyString("help_file"), scroll, HELP_WIDTH, HELP_HEIGHT);
+				HelpDialog samplesPanel = new HelpDialog(AppSession
+						.getInstance().getApp().getComponent(), "all_61",
+						Functions.getInstance().getPropertyString("help_file"),
+						scroll, HELP_WIDTH, HELP_HEIGHT);
 				samplesPanel.setVisible(false);
 				samplesPanel.scrollToKey(scroll);
 				break;
-			case 70:	// exercises
+			case 70: // exercises
 			case 71:
 			case 72:
 			case 73:
 
-				if (action == 70) scroll = "scheduling_exercises";
-				if (action == 71) scroll = "memory_exercises";
-				if (action == 72) scroll = "filesystem_exercises";
-				if (action == 73) scroll = "disk_exercises";
+				if (action == 70)
+					scroll = "scheduling_exercises";
+				if (action == 71)
+					scroll = "memory_exercises";
+				if (action == 72)
+					scroll = "filesystem_exercises";
+				if (action == 73)
+					scroll = "disk_exercises";
 
-				HelpDialog exercisesPanel = new HelpDialog(AppSession.getInstance().getApp().getComponent(), "all_61", Functions.getInstance().getPropertyString("help_file"), scroll, HELP_WIDTH, HELP_HEIGHT);
+				HelpDialog exercisesPanel = new HelpDialog(AppSession
+						.getInstance().getApp().getComponent(), "all_61",
+						Functions.getInstance().getPropertyString("help_file"),
+						scroll, HELP_WIDTH, HELP_HEIGHT);
 				exercisesPanel.setVisible(false);
 				exercisesPanel.scrollToKey(scroll);
 				break;
 			}
 
-			if (AppSession.getInstance().getPresenter() != null 
-					&& !saveMenuItem.isEnabled() 
-					&& AppSession.getInstance().getApp().allowOpenSave()) saveMenuItem.setEnabled(true);
+			if (AppSession.getInstance().getPresenter() != null
+					&& !saveMenuItem.isEnabled()
+					&& AppSession.getInstance().getApp().allowOpenSave())
+				saveMenuItem.setEnabled(true);
 		}
 	}
 
 	/**
 	 * Translate menu
 	 * 
-	 * @param o		observable
-	 * @param arg	unused
+	 * @param o
+	 *            observable
+	 * @param arg
+	 *            unused
 	 */
 	public void update(Observable o, Object arg) {
-		fileMenu.setText(Translation.getInstance().getLabel("all_50")); 
-		fileMenu.setMnemonic(Translation.getInstance().getLabel("all_20").charAt(0));
-		exitMenuItem.setText(Translation.getInstance().getLabel("all_51")); 
-		openMenuItem.setText(Translation.getInstance().getLabel("all_12")); // Open simulation
+		fileMenu.setText(Translation.getInstance().getLabel("all_50"));
+		fileMenu.setMnemonic(Translation.getInstance().getLabel("all_20")
+				.charAt(0));
+		exitMenuItem.setText(Translation.getInstance().getLabel("all_51"));
+		openMenuItem.setText(Translation.getInstance().getLabel("all_12")); // Open
+																			// simulation
 		saveMenuItem.setText(Translation.getInstance().getLabel("all_13"));
-		homeMenuItem.setText(Translation.getInstance().getLabel("all_14")); // Home screen
-		processMenu.setText(Translation.getInstance().getLabel("all_52")); 
-		processMenu.setMnemonic(Translation.getInstance().getLabel("all_24").charAt(0));
+		homeMenuItem.setText(Translation.getInstance().getLabel("all_14")); // Home
+																			// screen
+		processMenu.setText(Translation.getInstance().getLabel("all_52"));
+		processMenu.setMnemonic(Translation.getInstance().getLabel("all_24")
+				.charAt(0));
 		simProcsMenuItem.setText(Translation.getInstance().getLabel("all_53"));
-		memoryMenu.setText(Translation.getInstance().getLabel("all_54")); 
-		memoryMenu.setMnemonic(Translation.getInstance().getLabel("all_26").charAt(0));
+		memoryMenu.setText(Translation.getInstance().getLabel("all_54"));
+		memoryMenu.setMnemonic(Translation.getInstance().getLabel("all_26")
+				.charAt(0));
 		simMemMenuItem.setText(Translation.getInstance().getLabel("all_55"));
-		diskMenu.setText(Translation.getInstance().getLabel("all_56")); 
-		diskMenu.setMnemonic(Translation.getInstance().getLabel("all_28").charAt(0));
-		simdiskMngMenuItem.setText(Translation.getInstance().getLabel("all_57"));
-		filesMenu.setText(Translation.getInstance().getLabel("all_58")); 
-		filesMenu.setMnemonic(Translation.getInstance().getLabel("all_30").charAt(0));
+		diskMenu.setText(Translation.getInstance().getLabel("all_56"));
+		diskMenu.setMnemonic(Translation.getInstance().getLabel("all_28")
+				.charAt(0));
+		simdiskMngMenuItem
+				.setText(Translation.getInstance().getLabel("all_57"));
+		filesMenu.setText(Translation.getInstance().getLabel("all_58"));
+		filesMenu.setMnemonic(Translation.getInstance().getLabel("all_30")
+				.charAt(0));
 		simFilesMenuItem.setText(Translation.getInstance().getLabel("all_59"));
 		helpMenu.setText(Translation.getInstance().getLabel("all_61"));
-		helpMenu.setMnemonic(Translation.getInstance().getLabel("all_33").charAt(0));
+		helpMenu.setMnemonic(Translation.getInstance().getLabel("all_33")
+				.charAt(0));
 		helpMenuItem.setText(Translation.getInstance().getLabel("all_61"));
 		aboutMenuItem.setText(Translation.getInstance().getLabel("all_60"));
 

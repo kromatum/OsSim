@@ -48,4 +48,5 @@ public class ProcessPage extends ProcessComponent {
 		info.add(1, new ColorCell(new Integer(bid).toString(), Color.WHITE));
 		return info;
 	}
+	
 }

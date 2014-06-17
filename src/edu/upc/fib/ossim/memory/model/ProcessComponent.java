@@ -20,6 +20,7 @@ public abstract class ProcessComponent implements ProcessMemUnit, Cloneable {
 	protected int bid;
 	protected int size;
 	protected boolean load;
+	protected int time;
 
 	/**
 	 * Constructs a process component
@@ -35,6 +36,7 @@ public abstract class ProcessComponent implements ProcessMemUnit, Cloneable {
 		this.bid = bid;
 		this.size = size;
 		this.load = load;
+		this.time = 0;
 	}
 
 	/**
@@ -75,6 +77,16 @@ public abstract class ProcessComponent implements ProcessMemUnit, Cloneable {
 	 */
 	public int getSize() {
 		return this.size;	// Size of block
+	}
+	
+	public int getTime(){
+		return this.time;
+	}
+	public void setTime(int time){
+		this.time = time;
+	}
+	public void addTime(){
+		this.time ++;
 	}
 
 	/**
