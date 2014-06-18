@@ -9,101 +9,74 @@ import java.util.Vector;
 import edu.upc.fib.ossim.utils.SoSimException;
 import edu.upc.fib.ossim.utils.Translation;
 
+
 /**
- * Memory Management Model (Model - View - Presenter Pattern). Different
- * management algorithm are implemented through Strategy Pattern. Model manage a
- * maximum of<code>"MAX_PROCESSES"</code> processes.
+ * Memory Management Model (Model - View - Presenter Pattern). Different management algorithm are implemented 
+ * through Strategy Pattern. Model manage a maximum of<code>"MAX_PROCESSES"</code> processes.    
  * 
  * @author Alex Macia
  */
 public class ContextMemory {
 	public static final int MAX_PROCESSES = 20;
 	private MemStrategy algorithm;
-	private int memorySize;
+	private int memorySize; 
 	private int token;
 	private int osSize;
-	// Separate queue's cause different orders
-	private List<ProcessMemUnit> processQueue; // Processes arriving, creation
-												// ordered r
-	private List<MemPartition> memory; // Memory structure, ordered by init
-										// address
-	private List<MemPartition> virtualmemory; // Memory structure, ordered by
-												// init address
-	private List<ProcessMemUnit> swap; // Processes swapped out
-
-	private List<ProcessMemUnit> pqBkup; // Programs arriving backup to restore
-											// initial state
-	private List<MemPartition> bqBkup; // Memory structure backup to restore
-										// initial state
-	private List<MemPartition> bqBkupv; // Memory structure backup to restore
-										// initial state
+	// Separate queue's cause different orders   
+	private List<ProcessMemUnit> processQueue; 	// Processes arriving, creation ordered r
+	private List<MemPartition> memory; 	// Memory structure, ordered by init address 
+	private List<MemPartition> virtualmemory; 	// Memory structure, ordered by init address 
+	private List<ProcessMemUnit> swap; 	// Processes swapped out
+	
+	private List<ProcessMemUnit> pqBkup; 		// Programs arriving backup to restore initial state  
+	private List<MemPartition> bqBkup; 		// Memory structure backup to restore initial state
+	private List<MemPartition> bqBkupv; 		// Memory structure backup to restore initial state
 	private ProcessMemUnit selectedProcess;
 	private MemPartition selectedPartition;
 	private ProcessMemUnit selectedSwap;
+	
 
 	/**
-	 * Constructs a ContextMemory: sets main parameters (os, memory and page
-	 * size), a concrete algorithm strategy and initialize memory allocating the
-	 * operating system
+	 * Constructs a ContextMemory: sets main parameters (os, memory and page size), a concrete algorithm strategy and
+	 * initialize memory allocating the operating system 
 	 * 
-	 * @param memorySize
-	 *            memory size
-	 * @param osSize
-	 *            operating system size
-	 * @param pageSize
-	 *            page size
-	 * @param algorithm
-	 *            default algorithm
-	 * 
+	 * @param memorySize	memory size
+	 * @param osSize		operating system size
+	 * @param pageSize		page size
+	 * @param algorithm		default algorithm
+	 *  
 	 */
-	
-	public ContextMemory(int memorySize, int osSize, int pageSize,
-			MemStrategy algorithm) {
-		this.memorySize = memorySize;
-		this.osSize = osSize;
-		this.algorithm = algorithm;
-		this.token = 0;
-		processQueue = new LinkedList<ProcessMemUnit>();
-		memory = new LinkedList<MemPartition>();
-		virtualmemory = new LinkedList<MemPartition>();
-		swap = new LinkedList<ProcessMemUnit>();
-		pqBkup = new LinkedList<ProcessMemUnit>();
-		bqBkup = new LinkedList<MemPartition>();
-		bqBkupv = new LinkedList<MemPartition>();
-
-		// Add OS.
-		algorithm.initMemory(memory, Translation.getInstance()
-				.getLabel("me_90"), osSize, Color.lightGray, memorySize);
-		algorithm.initVirtualMemory(virtualmemory, Translation.getInstance()
-				.getLabel("me_90"), osSize, Color.lightGray, memorySize);
-
-	
-		swap = new LinkedList<ProcessMemUnit>();
-		pqBkup = new LinkedList<ProcessMemUnit>();
-		bqBkup = new LinkedList<MemPartition>();
-		bqBkupv = new LinkedList<MemPartition>();
-
-		// Add OS.
-		algorithm.initMemory(memory, Translation.getInstance()
-				.getLabel("me_90"), osSize, Color.lightGray, memorySize);
-		algorithm.initVirtualMemory(virtualmemory, Translation.getInstance()
-				.getLabel("me_90"), osSize, Color.lightGray, memorySize);
-
-	}
-
-	/**
-	 * Returns memory size
-	 * 
-	 * @return memory size
-	 */
+    public ContextMemory(int memorySize, int osSize, int pageSize, MemStrategy algorithm) {
+        this.memorySize = memorySize;
+        this.osSize = osSize;
+    	this.algorithm = algorithm;
+    	this.token = 0;
+        processQueue = new LinkedList<ProcessMemUnit>();
+        memory = new LinkedList<MemPartition>();
+        virtualmemory = new LinkedList<MemPartition>();
+        swap = new LinkedList<ProcessMemUnit>();
+        pqBkup = new LinkedList<ProcessMemUnit>();
+        bqBkup = new LinkedList<MemPartition>();
+        bqBkupv = new LinkedList<MemPartition>();
+        
+        //	Add OS.
+        algorithm.initMemory(memory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
+        algorithm.initVirtualMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
+        
+    }
+ 
+    /**
+     * Returns memory size
+     * 
+     * @return memory size
+     */
 	public int getMemorySize() {
 		return memorySize;
 	}
-
 	public int getVirtualMemorySize() {
-		return 5 * memorySize;
+		return 5*memorySize;
 	}
-
+	
 	/**
 	 * Returns operating system size
 	 * 
@@ -114,63 +87,56 @@ public class ContextMemory {
 	}
 
 	/**
-	 * Returns processes count
-	 * 
-	 * @return processes count
-	 */
-	public int getProcessCount() {
+     * Returns processes count  
+     * 
+     * @return	processes count
+     */
+ 	public int getProcessCount() {
 		return processQueue.size();
 	}
 
+ 	/**
+ 	 * Sets memory parameters, initialize memory, loads operating system and clear processes queue 
+ 	 * 
+ 	 * @param memorySize	memory size
+ 	 * @param osSize		operating system size
+ 	 */
+ 	
+	public void setMemorySizeParams(int memorySize, int osSize){
+    	this.memorySize = memorySize;
+    	this.osSize = osSize;
+    	algorithm.initMemory(memory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
+    	algorithm.initVirtualMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
+    	processQueue.clear();
+    }
+	
+	
+	
 	/**
-	 * Sets memory parameters, initialize memory, loads operating system and
-	 * clear processes queue
-	 * 
-	 * @param memorySize
-	 *            memory size
-	 * @param osSize
-	 *            operating system size
-	 */
+     * Change algorithm strategy, initialize memory, loads operating system
+     * and clear processes queue    
+     * 
+     * @param algorithm	new algorithm
+     */
+    public void setAlgorithm(MemStrategy algorithm){
+    	this.algorithm = algorithm;
+    	algorithm.initMemory(memory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
+    	algorithm.initVirtualMemory(virtualmemory, Translation.getInstance().getLabel("me_90"), osSize, Color.lightGray, memorySize);
+    	processQueue.clear();
+    }
 
-	public void setMemorySizeParams(int memorySize, int osSize) {
-		this.memorySize = memorySize;
-		this.osSize = osSize;
-		algorithm.initMemory(memory, Translation.getInstance()
-				.getLabel("me_90"), osSize, Color.lightGray, memorySize);
-		algorithm.initVirtualMemory(virtualmemory, Translation.getInstance()
-				.getLabel("me_90"), osSize, Color.lightGray, memorySize);
-		processQueue.clear();
-	}
-
-	/**
-	 * Change algorithm strategy, initialize memory, loads operating system and
-	 * clear processes queue
-	 * 
-	 * @param algorithm
-	 *            new algorithm
-	 */
-	public void setAlgorithm(MemStrategy algorithm) {
-		this.algorithm = algorithm;
-		algorithm.initMemory(memory, Translation.getInstance()
-				.getLabel("me_90"), osSize, Color.lightGray, memorySize);
-		algorithm.initVirtualMemory(virtualmemory, Translation.getInstance()
-				.getLabel("me_90"), osSize, Color.lightGray, memorySize);
-		processQueue.clear();
-	}
-
-	/**
+    /**
 	 * @see MemStrategy#setPolicy(String)
 	 */
 	public void setPolicy(String policy) {
-		algorithm.setPolicy(policy);
+		algorithm.setPolicy(policy); 
 	}
-
+    
 	/**
-	 * Gets selected process data: id, name, size, duration and color and
-	 * (optional) its components. Only in segmentation and pagination programs
-	 * are divided in components (pages or segments)
+	 * Gets selected process data: id, name, size, duration and color and (optional) its components. 
+	 * Only in segmentation and pagination programs are divided in components (pages or segments)
 	 * 
-	 * @return selected process data
+	 * @return	selected process data
 	 * 
 	 * @see MemStrategy#getProcessComponentsData(ProcessMemUnit)
 	 */
@@ -182,7 +148,7 @@ public class ContextMemory {
 		data.add(selectedProcess.getParent().getDuration());
 		data.add(selectedProcess.getParent().getColor());
 		data.add(algorithm.getProcessComponentsData(selectedProcess));
-		data.add(selectedProcess.getParent().getQuantumOrders());
+		data.add(selectedProcess.getParent().getQuantumOrders());	
 		data.add(selectedProcess.getParent().getQuantum());
 		return data;
 	}
@@ -190,8 +156,7 @@ public class ContextMemory {
 	/**
 	 * Selects a process identified by id
 	 * 
-	 * @param id
-	 *            process identifier
+	 * @param id	process identifier
 	 * 
 	 * @return process exist
 	 */
@@ -201,12 +166,10 @@ public class ContextMemory {
 	}
 
 	/**
-	 * Selects a process or one of its components in the backing store
-	 * identified by compoundId. compoundId = 1000 * pid + component seq
-	 * identifier
+	 * Selects a process or one of its components in the backing store identified by compoundId. 
+	 * compoundId = 1000 * pid + component seq identifier
 	 * 
-	 * @param compoundId
-	 *            process component identifier
+	 * @param compoundId	process component identifier
 	 * 
 	 * @return swapped process (or component) exist
 	 */
@@ -218,10 +181,9 @@ public class ContextMemory {
 		while (it.hasNext()) {
 			p = it.next();
 			int id = p.getPid() * 1000;
-
-			if (p.getParent().getNumBlocks() != 0)
-				id += ((ProcessComponent) p).getBid();
-
+			
+			if (p.getParent().getNumBlocks() != 0) id += ((ProcessComponent) p).getBid(); 
+		
 			if (id == compoundId) {
 				selectedSwap = p;
 				return true;
@@ -231,153 +193,132 @@ public class ContextMemory {
 	}
 
 	/**
-	 * Selects a memory partition identified by id (start address), OS partition
-	 * can't be selected, neither while running partitions with no process
-	 * allocated except. When not running concrete selection strategies depends
-	 * on current algorithm
+	 * Selects a memory partition identified by id (start address), OS partition can't be selected,
+	 * neither while running partitions with no process allocated except. When not running  
+	 * concrete selection strategies depends on current algorithm 
 	 * 
-	 * @param start
-	 *            memory partition identifier (start address)
-	 * @param started
-	 *            simulation is running
+	 * @param start	memory partition identifier (start address)
+	 * @param started simulation is running
 	 * 
 	 * @return partition exists and can be selected
 	 */
 	public boolean setSelectedPartition(int start, boolean started) {
 		selectedPartition = getByStart(start);
-		if (selectedPartition == null)
-			return false;
-		if (selectedPartition.getAllocated() != null
-				&& selectedPartition.getAllocated().getParent().getPid() == 0)
-			return false;
+		if (selectedPartition == null) return false; 
+		if (selectedPartition.getAllocated() != null && selectedPartition.getAllocated().getParent().getPid() == 0) return false;
 		if (started) {
-			if (selectedPartition.getAllocated() == null)
-				return false;
-			else
-				return true;
-		} else
-			return algorithm.isSelectable(); // only true for FIX
+			if (selectedPartition.getAllocated() == null) return false;
+			else return true;
+		} else return algorithm.isSelectable(); // only true for FIX 
 	}
-
+	
 	/**
 	 * Returns selected memory partition start address
 	 * 
-	 * @return selected memory partition start address
+	 * @return	selected memory partition start address
 	 */
-	public int getSelectedPartitionId() {
+    public int getSelectedPartitionId() {
 		return selectedPartition.getStart();
 	}
 
 	/**
-	 * Returns selected memory partition data, memory size, start address and
-	 * partition size
+	 * Returns selected memory partition data, memory size, start address and partition size
 	 * 
-	 * @return memory partition data
+	 * @return	memory partition data
 	 */
-	public Vector<Object> getSelectedPartitionData() {
-		Vector<Object> data = new Vector<Object>();
-		data.add(getMemorySize() - 1);
+    public Vector<Object> getSelectedPartitionData() {
+    	Vector<Object> data = new Vector<Object>();
+    	data.add(getMemorySize()-1); 
 		data.add(selectedPartition.getStart());
 		data.add(selectedPartition.getSize());
 		return data;
-	}
+    }
 
-	/**
-	 * Returns list iterator with queued processes identifiers
-	 * 
-	 * @return list iterator
-	 */
-	public Iterator<Integer> iteratorProcesses() {
-		// Returns ordered iterator from queue
-		// Returns LinkedList with program's PID's
+    /**
+     * Returns list iterator with queued processes identifiers 
+     * 
+     * @return	list iterator
+     */
+    public Iterator<Integer> iteratorProcesses() {
+    	// Returns ordered iterator from queue
+    	// Returns LinkedList with program's PID's
 		LinkedList<Integer> queueInteger = new LinkedList<Integer>();
-
+		
 		Iterator<ProcessMemUnit> it = processQueue.iterator();
-		while (it.hasNext())
-			queueInteger.add(new Integer(it.next().getPid()));
-
+		while (it.hasNext()) queueInteger.add(new Integer(it.next().getPid()));
+		
 		return queueInteger.iterator();
 	}
 
-	/**
-	 * Returns list iterator with memory partitions identifiers (start
-	 * addresses)
-	 * 
-	 * @return list iterator
-	 */
-	public Iterator<Integer> iteratorPartitions() {
-		// Returns ordered iterator from queue
-		// Returns LinkedList with partition's start address
+    /**
+     * Returns list iterator with memory partitions identifiers (start addresses) 
+     * 
+     * @return	list iterator
+     */
+    public Iterator<Integer> iteratorPartitions() {
+    	// Returns ordered iterator from queue
+    	// Returns LinkedList with partition's start address
 		LinkedList<Integer> queueInteger = new LinkedList<Integer>();
-
+		
 		Iterator<MemPartition> it = memory.iterator();
-		while (it.hasNext())
-			queueInteger.add(new Integer(it.next().getStart()));
-
+		while (it.hasNext()) queueInteger.add(new Integer(it.next().getStart()));
+		
 		return queueInteger.iterator();
 	}
-
-	public Iterator<Integer> iteratorVirtualPartitions() {
-		// Returns ordered iterator from queue
-		// Returns LinkedList with partition's start address
+    public Iterator<Integer> iteratorVirtualPartitions() {
+    	// Returns ordered iterator from queue
+    	// Returns LinkedList with partition's start address
 		LinkedList<Integer> queueInteger = new LinkedList<Integer>();
-
+		
 		Iterator<MemPartition> it = virtualmemory.iterator();
-		while (it.hasNext())
-			queueInteger.add(new Integer(it.next().getStart()));
+		while (it.hasNext()) queueInteger.add(new Integer(it.next().getStart()));	
 		return queueInteger.iterator();
 	}
+    
 
-	/**
-	 * Returns list iterator with processes in backing store (totally or
-	 * partially) identifiers
-	 * 
-	 * @return list iterator
-	 */
-	public Iterator<Integer> iteratorSwap() {
+    /**
+     * Returns list iterator with processes in backing store (totally or partially) identifiers 
+     * 
+     * @return	list iterator
+     */
+    public Iterator<Integer> iteratorSwap() {
 		// Returns ordered iterator from queue
 		// Returns LinkedList with swapped process pid's
 		LinkedList<Integer> queueObjects = new LinkedList<Integer>();
-
+		
 		Iterator<ProcessMemUnit> it = swap.iterator();
 		while (it.hasNext()) {
 			int id = it.next().getPid();
-			if (!queueObjects.contains(id))
-				queueObjects.add(id); // If various units of the same process
+			if (!queueObjects.contains(id)) queueObjects.add(id); // If various units of the same process  
 		}
-
+		
 		return queueObjects.iterator();
 	}
 
 	private ProcessMemUnit getByPID(int pid) {
-		// Returns Program's PID from programs queue, swap, memory list or null
-		// if not exists
+		// Returns Program's PID from programs queue, swap, memory list or null if not exists
 		Iterator<ProcessMemUnit> it = processQueue.iterator();
 		Iterator<MemPartition> itb = memory.iterator();
 		Iterator<MemPartition> itbv = virtualmemory.iterator();
 		Iterator<ProcessMemUnit> itw = swap.iterator();
 		ProcessMemUnit p;
 		MemPartition b;
-
+		
 		while (it.hasNext()) {
 			p = it.next();
-			if (p.getPid() == pid)
-				return p;
+			if (p.getPid() == pid) return p;
 		}
 		while (itb.hasNext()) {
 			b = itb.next();
-			if (b.getAllocated() != null && b.getAllocated().getPid() == pid)
-				return b.getAllocated();
+			if (b.getAllocated() != null && b.getAllocated().getPid() == pid) return b.getAllocated();
 		}
 		while (itbv.hasNext()) {
 			b = itbv.next();
-			if (b.getAllocated() != null && b.getAllocated().getPid() == pid)
-				return b.getAllocated();
+			if (b.getAllocated() != null && b.getAllocated().getPid() == pid) return b.getAllocated();
 		}
 		while (itw.hasNext()) {
 			p = itw.next();
-			if (p.getPid() == pid)
-				return p;
+			if (p.getPid() == pid) return p;
 		}
 		return null;
 	}
@@ -386,34 +327,30 @@ public class ContextMemory {
 		// Returns Block's start from partitions queue or null if not exists
 		Iterator<MemPartition> it = memory.iterator();
 		MemPartition b;
-
+		
 		while (it.hasNext()) {
 			b = it.next();
-			if (b.getStart() == start)
-				return b;
+			if (b.getStart() == start) return b;
 		}
 		return null;
 	}
-
 	private MemPartition getByVirtualStart(int start) {
 		// Returns Block's start from partitions queue or null if not exists
 		Iterator<MemPartition> it = virtualmemory.iterator();
 		MemPartition b;
-
+		
 		while (it.hasNext()) {
 			b = it.next();
-			if (b.getStart() == start)
-				return b;
+			if (b.getStart() == start) return b;
 		}
 		return null;
 	}
 
 	/**
-	 * Gets process information, pid and name
+	 * Gets process information, pid and name       
 	 * 
-	 * @param pid
-	 *            process identifier
-	 * @return process information
+	 * @param pid	process identifier
+	 * @return	process information
 	 */
 	public Vector<String> getInfo(int pid) {
 		// Painters program info
@@ -422,11 +359,8 @@ public class ContextMemory {
 
 		info.add("PID " + p.getPid());
 		info.add(p.getParent().getName());
-		if (p.getParent().getDuration() == -1)
-			info.add(Translation.getInstance().getLabel("me_33") + " \u221e");
-		else
-			info.add(Translation.getInstance().getLabel("me_33") + " "
-					+ p.getParent().getDuration());
+		if (p.getParent().getDuration() == -1) info.add(Translation.getInstance().getLabel("me_33") + " \u221e"); 
+		else info.add(Translation.getInstance().getLabel("me_33") + " " + p.getParent().getDuration());
 
 		return info;
 	}
@@ -438,81 +372,69 @@ public class ContextMemory {
 		ProcessMemUnit p = getByPID(pid);
 		return algorithm.getComponentSizeInfo(p.getParent());
 	}
-
+	
 	/**
-	 * Returns total number of components of a process identified by pid. In
-	 * contiguous memory management process have only 1 component.
-	 * 
+	 * Returns total number of components of a process identified by pid.
+	 * In contiguous memory management process have only 1 component. 
+	 *
 	 * @return total number of components of a process
 	 */
 	public int getTotalComponents(int pid) {
 		ProcessMemUnit p = getByPID(pid);
-		if (p.getParent().getNumBlocks() == 0)
-			return 1;
-		else
-			return p.getParent().getNumBlocks();
+		if (p.getParent().getNumBlocks() == 0) return 1;
+		else return p.getParent().getNumBlocks();
 	}
 
 	/**
-	 * Returns size of a concrete process component. In contiguous memory
-	 * management returns process size.
-	 * 
+	 * Returns size of a concrete process component.
+	 * In contiguous memory management returns process size. 
+	 *
 	 * @return size of a concrete process component
 	 */
 	public int getSizeOfComponents(int pid, int i) {
 		ProcessMemUnit p = getByPID(pid);
-		if (p.getParent().getNumBlocks() == 0)
-			return p.getSize();
-		else
-			return p.getParent().getBlock(i).getSize();
+		if (p.getParent().getNumBlocks() == 0) return p.getSize();
+		else return p.getParent().getBlock(i).getSize();
 	}
-
+	
 	/**
-	 * Returns when a process component is swapped or it would be swapped
+	 * Returns when a process component is swapped or it would be swapped 
 	 * 
-	 * @see a process component is swapped or it would be swapped
-	 *      (Process.isLoad())
+	 * @see a process component is swapped or it would be swapped (Process.isLoad()) 
 	 */
 	public boolean isComponentSwapped(int pid, int i) {
 		ProcessMemUnit p = getByPID(pid);
-		if (p.getParent().getNumBlocks() != 0)
-			return !p.getParent().getBlock(i).isLoad(); // Concrete component
+		if (p.getParent().getNumBlocks() != 0) return !p.getParent().getBlock(i).isLoad(); // Concrete component
 		return swap.contains(p);
 	}
 
 	/**
 	 * Returns when a process component is a page
 	 * 
-	 * @see a process component is a page
+	 * @see a process component is a page 
 	 */
 	public boolean isComponentPage(int pid, int i) {
 		ProcessMemUnit p = getByPID(pid);
-		if (p.getParent().getNumBlocks() == 0)
-			return false;
-		else
-			return p.getParent().getBlock(i).isPage();
+		if (p.getParent().getNumBlocks() == 0) return false;
+		else return p.getParent().getBlock(i).isPage();
 	}
 
 	/**
 	 * Gets process (if exists) color
 	 * 
-	 * @param pid
-	 *            process identifier
-	 * @return process color
+	 * @param pid	process identifier
+	 * @return	process color
 	 */
 	public Color getColor(int pid) {
-		if (getByPID(pid) == null)
-			return null;
-		else
-			return getByPID(pid).getParent().getColor();
+		if (getByPID(pid) == null) return null;
+		else return getByPID(pid).getParent().getColor();
 	}
 
 	/**
 	 * Gets process duration
 	 * 
-	 * @param pid
-	 *            process identifier
-	 * @return process duration
+	 * @param pid	process identifier
+	 * @return	process duration
 	 */
 	public int getDuration(int pid) {
 		return getByPID(pid).getParent().getDuration();
@@ -521,98 +443,80 @@ public class ContextMemory {
 	/**
 	 * Gets process size
 	 * 
-	 * @param pid
-	 *            process identifier
-	 * @return process size
+	 * @param pid	process identifier
+	 * @return	process size
 	 */
 	public int getSize(int pid) {
 		return getByPID(pid).getSize();
 	}
-
+	
 	/**
 	 * Gets unique process identifier
 	 * 
-	 * @return unique process identifier
+	 * @return	unique process identifier
 	 */
 	public int getMaxpid() {
 		return ProcessComplete.getMaxpid();
-	}
+	} 
 
 	/**
 	 * Gets memory partition size
 	 * 
-	 * @param start
-	 *            memory partition start address
-	 * @return memory partition size
+	 * @param start	memory partition start address
+	 * @return	memory partition size
 	 */
 	public int getMemSize(int start) {
 		return getByStart(start).getSize();
 	}
-
 	public int getVirtualMemSize(int start) {
 		return getByVirtualStart(start).getSize();
 	}
 
 	/**
-	 * Gets process size allocated at partition identified by start or -1 if no
-	 * process is allocated
+	 * Gets process size allocated at partition identified by start or -1 
+	 * if no process is allocated
 	 * 
-	 * @param start
-	 *            memory partition start address
-	 * @return process size allocated at partition identified by start or -1
+	 * @param start	memory partition start address
+	 * @return	process size allocated at partition identified by start or -1
 	 */
 	public int getMemProcessSize(int start) {
-		if (getByStart(start).getAllocated() != null)
-			return getByStart(start).getAllocated().getSize();
-		else
-			return -1;
+		if (getByStart(start).getAllocated() != null) return getByStart(start).getAllocated().getSize();
+		else return -1;
 	}
-
 	public int getVirtualMemProcessSize(int start) {
-		if (getByVirtualStart(start).getAllocated() != null)
-			return getByVirtualStart(start).getAllocated().getSize();
-		else
-			return -1;
+		if (getByVirtualStart(start).getAllocated() != null) return getByVirtualStart(start).getAllocated().getSize();
+		else return -1;
 	}
 
 	/**
-	 * Gets process color allocated at partition identified by start or null if
-	 * no process is allocated
+	 * Gets process color allocated at partition identified by start or null 
+	 * if no process is allocated
 	 * 
-	 * @param start
-	 *            memory partition start address
-	 * @return process color allocated at partition identified by start or null
+	 * @param start	memory partition start address
+	 * @return	process color allocated at partition identified by start or null
 	 */
 	public Color getMemProcessColor(int start) {
-		if (getByStart(start).getAllocated() != null)
-			return getByStart(start).getAllocated().getParent().getColor();
-		else
-			return null;
+		if (getByStart(start).getAllocated() != null) return getByStart(start).getAllocated().getParent().getColor();
+		else return null;
 	}
-
 	public Color getVirtualMemProcessColor(int start) {
-		if (getByVirtualStart(start).getAllocated() != null)
-			return getByVirtualStart(start).getAllocated().getParent()
-					.getColor();
-		else
-			return null;
+		if (getByVirtualStart(start).getAllocated() != null) return getByVirtualStart(start).getAllocated().getParent().getColor();
+		else return null;
 	}
 
-	/**
+	/** 
 	 * @see MemStrategy#hasExternalFragmentation()
 	 */
 	public boolean hasExternalFragmentation() {
 		return algorithm.hasExternalFragmentation();
 	}
-
+	
 	/**
-	 * Gets process information allocated at partition identified by start or
-	 * null if no process is allocated
+	 * Gets process information allocated at partition identified by start or null 
+	 * if no process is allocated
 	 * 
-	 * @param start
-	 *            memory partition start address
-	 * @return process information allocated at partition identified by start or
-	 *         null
+	 * @param start	memory partition start address
+	 * @return	process information allocated at partition identified by start or null
 	 * 
 	 * @see MemStrategy#getProcessComponentInfo(ProcessMemUnit)
 	 */
@@ -621,72 +525,58 @@ public class ContextMemory {
 		Vector<String> info = new Vector<String>();
 		if (getByStart(start).getAllocated() != null) {
 			ProcessMemUnit p = getByStart(start).getAllocated();
-			if (p.getParent().getPid() == 0)
-				info.add("ID " + p.getPid() + " (" + p.getParent().getName()
-						+ ")");
-			else
-				info.add("ID " + p.getPid() + " - "
-						+ algorithm.getProcessComponentInfo(p) + " ("
-						+ p.getParent().getName() + ")");
+			if (p.getParent().getPid() == 0) info.add("ID " + p.getPid() +  " (" + p.getParent().getName() + ")");
+			else info.add("ID " + p.getPid() + " - " +  algorithm.getProcessComponentInfo(p) +  " (" + p.getParent().getName() + ")");
 			return info;
-		} else
-			return null;
+		}
+		else return null;
 	}
-
 	public Vector<String> getVirtualMemProcessInfo(int start) {
 		// Painters virtual memory info
 		Vector<String> info = new Vector<String>();
 		if (getByVirtualStart(start).getAllocated() != null) {
 			ProcessMemUnit p = getByVirtualStart(start).getAllocated();
-			// if (p.getParent().getPid() == 0) info.add("");
-			info.add("ID " + p.getPid() + " - "
-					+ algorithm.getProcessComponentInfo(p) + " ("
-					+ p.getParent().getName() + ")");
+			//if (p.getParent().getPid() == 0) info.add("");
+			info.add("ID " + p.getPid() + " - " +  algorithm.getProcessComponentInfo(p) +  " (" + p.getParent().getName() + ")");
 			return info;
-		} else
-			return null;
+		}
+		else return null;
 	}
 
 	/**
-	 * Returns process information for address translation form
+	 * Returns process information for address translation form 
 	 * 
-	 * @return process information for address translation form
+	 * @return	process information for address translation form
 	 */
 	public String getAddTransProgInfo() {
 		ProcessComplete p = selectedPartition.getAllocated().getParent();
-		return "PID " + p.getPid() + " (" + p.getParent().getName() + ") "
-				+ Translation.getInstance().getLabel("me_77") + ":"
-				+ p.getParent().getSize() + " u.";
+		return "PID " + p.getPid() + " (" + p.getParent().getName() + ") " + Translation.getInstance().getLabel("me_77") + ":" + p.getParent().getSize() + " u.";
 	}
-
+	
 	/**
-	 * Returns logical address translation to physical
+	 * Returns logical address translation to physical 
 	 * 
-	 * @param logicalAddr
-	 *            process logical address
-	 * @return logical address translation to physical
+	 * @param logicalAddr	process logical address
+	 * @return	logical address translation to physical
 	 */
 	public String getAddTransPhysical(int logicalAddr) {
 		// Work in progress
 		ProcessComplete p = selectedPartition.getAllocated().getParent();
-		if (logicalAddr >= p.getSize())
-			return Translation.getInstance().getLabel("me_85"); // Illegal
-																// address
-		return algorithm.getAddTransPhysical(selectedPartition, logicalAddr,
-				memory);
+		if (logicalAddr >= p.getSize()) return Translation.getInstance().getLabel("me_85"); // Illegal address
+		return algorithm.getAddTransPhysical(selectedPartition, logicalAddr, memory);
 	}
-
+	
 	/**
 	 * @see MemStrategy#getXMLDataMemory()
 	 */
-	public Vector<Vector<Vector<String>>> getXMLDataMemory() {
+	public  Vector<Vector<Vector<String>>> getXMLDataMemory() {
 		return algorithm.getXMLDataMemory(memory);
 	}
-
+	
 	/**
-	 * Returns processes queue xml information
+	 * Returns processes queue xml information 
 	 * 
-	 * @return processes queue xml information
+	 * @return	processes queue xml information
 	 * 
 	 * @see ProcessMemUnit#getXMLInfo()
 	 */
@@ -698,32 +588,32 @@ public class ContextMemory {
 		}
 		return data;
 	}
-
+	
 	/**************************************************************************************************/
-	/************************************* Specific Strategies ***************************************/
+	/*************************************  Specific Strategies ***************************************/
 	/**************************************************************************************************/
 
 	/**
-	 * Returns memory information table header
+	 * Returns memory information table header 
 	 * 
-	 * @return memory information table header
+	 * @return	memory information table header
 	 * 
 	 * @see MemStrategy#getTableHeaderInfo()
 	 */
 	public Vector<Object> getTableHeaderInfo() {
-		// Information table Header
+		// Information table Header 
 		return algorithm.getTableHeaderInfo();
 	}
-
+	
 	/**
-	 * Returns memory information table data depending on current algorithm
+	 * Returns memory information table data depending on current algorithm      
 	 * 
-	 * @return memory information table data
+	 * @return	memory information table data
 	 * 
 	 * @see MemStrategy#getTableBlockInfo(MemPartition, int)
 	 */
 	public Vector<Vector<Object>> getTableInfoData() {
-		// General information data
+		// General information data 
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 
 		Iterator<MemPartition> it = memory.iterator();
@@ -732,13 +622,11 @@ public class ContextMemory {
 			data.add(algorithm.getTableBlockInfo(m));
 		}
 
-		if (data.size() == 0)
-			return null;
+		if (data.size() == 0) return null;
 		return data;
 	}
-
 	public Vector<Vector<Object>> getVirtualTableInfoData() {
-		// General information data
+		// General information data 
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 
 		Iterator<MemPartition> it = virtualmemory.iterator();
@@ -747,16 +635,14 @@ public class ContextMemory {
 			data.add(algorithm.getTableBlockInfo(m));
 		}
 
-		if (data.size() == 0)
-			return null;
+		if (data.size() == 0) return null;
 		return data;
 	}
 
 	/**
-	 * Returns memory partition information table data depending on current
-	 * algorithm
+	 * Returns memory partition information table data depending on current algorithm      
 	 * 
-	 * @return memory information table data
+	 * @return	memory information table data
 	 * 
 	 * @see MemStrategy#getTableBlockInfo(MemPartition, int)
 	 */
@@ -765,461 +651,394 @@ public class ContextMemory {
 		MemPartition m = getByStart(start);
 		return algorithm.getTableBlockInfo(m);
 	}
-
 	public Vector<Object> getVirtualMemBlockInfo(int start) {
 		// Information table data
 		MemPartition m = getByVirtualStart(start);
 		return algorithm.getTableBlockInfo(m);
 	}
-
+	
 	/**
-	 * Returns process creation table header depending on current algorithm
+	 * Returns process creation table header depending on current algorithm      
 	 * 
-	 * @return process creation table header depending on current algorithm
+	 * @return	process creation table header depending on current algorithm      
 	 * 
 	 * @see MemStrategy#getFormTableHeader()
 	 */
 	public Vector<Object> getFormTableHeader() {
-		// Form program Header
+		// Form program Header 
 		return algorithm.getFormTableHeader();
 	}
 
 	/**
-	 * Returns process creation table initial data (pagination only)
+	 * Returns process creation table initial data (pagination only)      
 	 * 
-	 * @return process creation table initial data (pagination only)
+	 * @return	process creation table initial data (pagination only)      
 	 * 
 	 * @see MemStrategy#getFormTableInitData(int)
 	 */
 	public Vector<Vector<Object>> getFormTableInitData() {
-		// Form program Initial Data
+		// Form program Initial Data 
 		return algorithm.getFormTableInitData();
 	}
-
+	
 	/**
-	 * Returns allocation tables header, pages table (pagination) or segments
-	 * table (segmentation)
-	 * 
-	 * @return allocation tables header
+	 * Returns allocation tables header, pages table (pagination) or segments table (segmentation)
+	 *  
+	 * @return	allocation tables header      
 	 * 
 	 * @see MemStrategy#getMemProcessTableHeader()
 	 */
 	public Vector<Object> getMemProcessTableHeader() {
-		// Allocation tables header, segmentation table and page table
+		// Allocation tables header, segmentation table and page table 
 		return algorithm.getMemProcessTableHeader();
 	}
-
+	
 	/**
-	 * Returns allocation tables data, pages table (pagination) or segments
-	 * table (segmentation)
-	 * 
-	 * @return allocation tables data
+	 * Returns allocation tables data, pages table (pagination) or segments table (segmentation)
+	 *  
+	 * @return	allocation tables data      
 	 * 
 	 * @see MemStrategy#getMemProcessTableData(List, ProcessComplete, int)
-	 * 
-	 * @throws SoSimException
-	 *             no process is allocated into selected partition
+	 *
+	 * @throws SoSimException	no process is allocated into selected partition 
 	 */
-	public Vector<Vector<Object>> getMemProcessTableData()
-			throws SoSimException {
-		// Allocation tables, segmentation table and page table
-		if (selectedPartition.getAllocated() == null)
-			throw new SoSimException("me_09");
-		return algorithm.getMemProcessTableData(memory, selectedPartition
-				.getAllocated().getParent());
+	public Vector<Vector<Object>> getMemProcessTableData() throws SoSimException {
+		// Allocation tables, segmentation table and page table 
+		if (selectedPartition.getAllocated() == null) throw new SoSimException("me_09");
+		return algorithm.getMemProcessTableData(memory, selectedPartition.getAllocated().getParent());
 	}
-
-	public Vector<Vector<Object>> getVirtualMemProcessTableData()
-			throws SoSimException {
-		// Allocation tables, segmentation table and page table
-		if (selectedPartition.getAllocated() == null)
-			throw new SoSimException("me_09");
-		return algorithm.getMemProcessTableData(virtualmemory,
-				selectedPartition.getAllocated().getParent());
+	public Vector<Vector<Object>> getVirtualMemProcessTableData() throws SoSimException {
+		// Allocation tables, segmentation table and page table 
+		if (selectedPartition.getAllocated() == null) throw new SoSimException("me_09");
+		return algorithm.getMemProcessTableData(virtualmemory, selectedPartition.getAllocated().getParent());
 	}
-
+	
 	/**
-	 * Adds a new process to processes queue, in pagination and segmentation
-	 * also create its components, pages or segments
-	 * 
-	 * @param data
-	 *            process data: pid, name, size, duration and color
-	 * @param components
-	 *            in pagination, pages data, in segmentation, segments data
+	 * Adds a new process to processes queue, in pagination and segmentation 
+	 * also create its components, pages or segments      
+	 *  
+	 * @param data	process data: pid, name, size, duration and color
+	 * @param components	in pagination, pages data, in segmentation, segments data   
 	 * 
 	 * @see MemStrategy#addProcessComponents(ProcessComplete, Vector, int)
 	 */
-	public void addProgram(Vector<Object> data,
-			Vector<Vector<Object>> components) {
-		// Add Program p to program's queue
-		ProcessComplete p = new ProcessComplete(new Integer(
-				(String) data.get(0)), (String) data.get(1),
-				(Integer) data.get(2), (Integer) data.get(3),
-				(Color) data.get(4));
-		processQueue.add(p);
-		algorithm.addProcessComponents(p, components);
-	}
+	public void addProgram(Vector<Object> data, Vector<Vector<Object>> components) {
+    	// Add Program p to program's queue 
+    	ProcessComplete p = new ProcessComplete(new Integer((String) data.get(0)), (String) data.get(1), (Integer) data.get(2), (Integer) data.get(3), (Color) data.get(4));
+    	processQueue.add(p);
+    	algorithm.addProcessComponents(p, components);
+    }
+    public void addProgram(Vector<Object> data, Vector<Vector<Object>> components, Object list, Object quantum) {
+    	// Add Program p to program's queue 
 
-	public void addProgram(Vector<Object> data,
-			Vector<Vector<Object>> components, Object list, Object quantum) {
-		//System.out.println("Here");
-		// Add Program p to program's queue
-		ProcessComplete p = new ProcessComplete(new Integer(
-				(String) data.get(0)), (String) data.get(1),
-				(Integer) data.get(2), (Integer) data.get(3),
-				(Color) data.get(4), (Integer) data.get(6),
-				(String) data.get(5));
-		/*, (Integer) data.get(6),
-		(String) data.get(5)*/
-		processQueue.add(p);
-		// pageQueue.
-		algorithm.addProcessComponents(p, components);
-		algorithm.addQuantumListData(p, list);
-		algorithm.addQuantum(p, quantum);
+    	ProcessComplete p = new ProcessComplete(new Integer((String) data.get(0)), (String) data.get(1), (Integer) data.get(2), (Integer) data.get(3), (Color) data.get(4));
+    	processQueue.add(p);    
+    	//pageQueue.
+    	algorithm.addProcessComponents(p, components);
+    	algorithm.addQuantumListData(p, list);
+    	algorithm.addQuantum(p,quantum);
+    	
+    }
 
-	}
 
 	/**
-	 * Update a process from processes queue, in pagination and segmentation
-	 * also updates its components, pages or segments
-	 * 
-	 * @param data
-	 *            process data: pid, name, size, duration and color
-	 * @param components
-	 *            in pagination, pages data, in segmentation, segments data
+	 * Update a process from processes queue, in pagination and segmentation 
+	 * also updates its components, pages or segments      
+	 *  
+	 * @param data	process data: pid, name, size, duration and color
+	 * @param components	in pagination, pages data, in segmentation, segments data   
 	 * 
 	 * @see MemStrategy#addProcessComponents(ProcessComplete, Vector, int)
 	 */
-	public void updProgram(Vector<Object> data,
-			Vector<Vector<Object>> components) {
-		// Add Program p to program's queue
-		int i = processQueue.indexOf(selectedProcess);
-		processQueue.remove(selectedProcess);
-		ProcessComplete p = new ProcessComplete(new Integer(
-				(String) data.get(0)), (String) data.get(1),
-				(Integer) data.get(2), (Integer) data.get(3),
-				(Color) data.get(4));
-		processQueue.add(i, p);
-		algorithm.addProcessComponents(p, components);
-	}
-
-	public void updProgram(Vector<Object> data,
-			Vector<Vector<Object>> components, Object list, Object quantum) {
-		// Add Program p to program's queue
-		// ArrayList<Integer> order = transformToArray(list);
-		int i = processQueue.indexOf(selectedProcess);
-		processQueue.remove(selectedProcess);
-		ProcessComplete p = new ProcessComplete(new Integer(
-				(String) data.get(0)), (String) data.get(1),
-				(Integer) data.get(2), (Integer) data.get(3),
-				(Color) data.get(4), (Integer) data.get(6),
-				(String) data.get(5));
-		processQueue.add(i, p);
-		algorithm.addProcessComponents(p, components);
-		algorithm.addQuantumListData(p, list);
-		algorithm.addQuantum(p, quantum);
-	}
-
+    public void updProgram(Vector<Object> data, Vector<Vector<Object>> components) {
+    	// Add Program p to program's queue 
+    	int i = processQueue.indexOf(selectedProcess);
+    	processQueue.remove(selectedProcess);
+    	ProcessComplete p = new ProcessComplete(new Integer((String) data.get(0)), (String) data.get(1), (Integer) data.get(2), (Integer) data.get(3), (Color) data.get(4));
+    	processQueue.add(i, p);
+    	algorithm.addProcessComponents(p, components);
+    }
+    
+    public void updProgram(Vector<Object> data, Vector<Vector<Object>> components,Object list, Object quantum) {
+    	// Add Program p to program's queue 
+    	//ArrayList<Integer> order = transformToArray(list);
+    	int i = processQueue.indexOf(selectedProcess);
+    	processQueue.remove(selectedProcess);
+    	ProcessComplete p = new ProcessComplete(new Integer((String) data.get(0)), (String) data.get(1), (Integer) data.get(2), (Integer) data.get(3), (Color) data.get(4));
+    	processQueue.add(i, p);
+    	algorithm.addProcessComponents(p, components);
+    	algorithm.addQuantumListData(p, list);
+    	algorithm.addQuantum(p, quantum);
+    }
+    
+    /**
+     * Removes selected process from processes queue
+     */
+    public void removeProgram() {
+    	// Removes Program p from its queue
+    	processQueue.remove(selectedProcess);
+    }
+	
+    /**
+     * Removes process allocated at selected partition. 
+     * 
+     * @throws SoSimException	selected partition has no process allocated or is trying to remove operating system
+     * 
+     * @see MemStrategy#removeProcessInMemory(List, MemPartition)	
+     */
+    public void removeProgramInMem() throws SoSimException {
+    	// Can't remove SO 
+    	if (selectedPartition.getStart() == 0) throw new SoSimException("me_04"); 
+    	if (selectedPartition.getAllocated() == null) throw new SoSimException("me_09");
+    	algorithm.removeProcessInMemory(memory, selectedPartition);
+    	
+    }
+    
 	/**
-	 * Removes selected process from processes queue
-	 */
-	public void removeProgram() {
-		// Removes Program p from its queue
-		processQueue.remove(selectedProcess);
-	}
-
-	/**
-	 * Removes process allocated at selected partition.
+	 * Adds a new memory partition, this partition becomes selected partition 
+	 *  
+	 * @param data	partition data: start address and size
 	 * 
-	 * @throws SoSimException
-	 *             selected partition has no process allocated or is trying to
-	 *             remove operating system
-	 * 
-	 * @see MemStrategy#removeProcessInMemory(List, MemPartition)
-	 */
-	public void removeProgramInMem() throws SoSimException {
-		// Can't remove SO
-		if (selectedPartition.getStart() == 0)
-			throw new SoSimException("me_04");
-		if (selectedPartition.getAllocated() == null)
-			throw new SoSimException("me_09");
-		algorithm.removeProcessInMemory(memory, selectedPartition);
-
-	}
-
-	/**
-	 * Adds a new memory partition, this partition becomes selected partition
-	 * 
-	 * @param data
-	 *            partition data: start address and size
-	 * 
-	 * @throws SoSimException
-	 *             new partition overlaps with any other existing partition or
-	 *             ends over memory size
+	 * @throws SoSimException	new partition overlaps with any other existing partition or ends over memory size
 	 * 
 	 */
-	public void addMemPartition(Vector<Object> data) throws SoSimException {
-		backup();
-		MemPartition b = new MemPartition((Integer) data.get(0),
-				(Integer) data.get(1));
+    public void addMemPartition(Vector<Object> data) throws SoSimException {
+    	backup();
+    	MemPartition b = new MemPartition((Integer) data.get(0), (Integer) data.get(1));
 		// Can't create partition at 0 address. SO
-		if (b.getStart() >= 0 && b.getStart() < osSize)
-			throw new SoSimException("me_05");
-		// Detect possible overlapping
-		Iterator<MemPartition> it = memory.iterator();
-
-		boolean end = false;
-		while (it.hasNext() && !end) {
-			MemPartition aux = it.next();
-			if (aux.getStart() == b.getStart())
-				throw new SoSimException("me_05");
-			if (aux.getStart() < b.getStart()
-					&& (aux.getStart() + aux.getSize()) > b.getStart())
-				throw new SoSimException("me_05");
-			if (b.getStart() < aux.getStart()
-					&& (b.getStart() + b.getSize()) > aux.getStart())
-				throw new SoSimException("me_05");
-		}
-
-		if (b.getStart() + b.getSize() > memorySize)
-			throw new SoSimException("me_07");
-
-		memory.add(b);
-		virtualmemory.add(b);
+    	if (b.getStart() >= 0 && b.getStart() < osSize) throw new SoSimException("me_05");
+    	// Detect possible overlapping
+    	Iterator<MemPartition> it =  memory.iterator();
+    	
+    	boolean end = false;
+    	while (it.hasNext() && !end) {
+    		MemPartition aux = it.next();
+    		if (aux.getStart() == b.getStart()) throw new SoSimException("me_05");
+    		if (aux.getStart() < b.getStart() && (aux.getStart() + aux.getSize()) > b.getStart()) throw new SoSimException("me_05");
+    		if (b.getStart() < aux.getStart() &&  (b.getStart() +  b.getSize()) > aux.getStart()) throw new SoSimException("me_05");
+    	}
+    	
+    	if (b.getStart() + b.getSize() > memorySize) throw new SoSimException("me_07");
+    	
+    	memory.add(b);	
+    	virtualmemory.add(b);
 		selectedPartition = b;
-	}
+    }
 
-	/**
-	 * Removes selected partition from memory
-	 * 
-	 * @throws SoSimException
-	 */
-	public void removeMemPartition() throws SoSimException {
-		// Can't remove SO
-		backup();
-		if (selectedPartition.getStart() == 0)
-			throw new SoSimException("me_04");
-		memory.remove(selectedPartition);
-	}
+    /**
+     * Removes selected partition from memory
+     * 
+     * @throws SoSimException
+     */
+    public void removeMemPartition() throws SoSimException {
+    	// Can't remove SO 
+    	backup();
+    	if (selectedPartition.getStart() == 0) throw new SoSimException("me_04"); 
+    	memory.remove(selectedPartition);
+    }
+    
+    /**
+     * Compacts and merge free memory partitions, it is used in segmentation and
+     * variable size partitioning 
+     * 
+     * @see MemStrategy#compaction(List, int)
+     */
+    public void compaction() {
+    	algorithm.compaction(memory, memorySize);
+    }
+    
+    /**
+     * Removes a selected process from backing store. In non contiguous 
+     * memory management strategies, process components are also removed from memory
+     *  
+     * @see MemStrategy#removeSwappedProcessComponents(List, ProcessMemUnit)
+     */
+    public void removeSwappedProgram() {
+    	// Removes Process p from swap queue
+    	algorithm.removeSwappedProcessComponents(memory, swap, selectedSwap);
+    }
 
-	/**
-	 * Compacts and merge free memory partitions, it is used in segmentation and
-	 * variable size partitioning
-	 * 
-	 * @see MemStrategy#compaction(List, int)
-	 */
-	public void compaction() {
-		algorithm.compaction(memory, memorySize);
-	}
-
-	/**
-	 * Removes a selected process from backing store. In non contiguous memory
-	 * management strategies, process components are also removed from memory
-	 * 
-	 * @see MemStrategy#removeSwappedProcessComponents(List, ProcessMemUnit)
-	 */
-	public void removeSwappedProgram() {
-		// Removes Process p from swap queue
-		algorithm.removeSwappedProcessComponents(memory, swap, selectedSwap);
-	}
-
-	/**
-	 * Allocates selected process from backing store into memory.
-	 * 
-	 * @throws SoSimException
-	 *             there is no memory available to allocate the process
-	 * 
-	 * @see MemStrategy#swapInProcessComponent(List, List, ProcessMemUnit, int)
-	 */
-	public void swapInProgramComponent() throws SoSimException {
-		// From backing Store to memory
-		algorithm
-				.swapInProcessComponent(memory, swap, selectedSwap, memorySize);
+    /**
+     * Allocates selected process from backing store into memory. 
+     * 
+     * @throws SoSimException		there is no memory available to allocate the process
+     * 
+     * @see MemStrategy#swapInProcessComponent(List, List, ProcessMemUnit, int)
+     */
+    public void swapInProgramComponent() throws SoSimException {
+    	// From backing Store to memory	
+		algorithm.swapInProcessComponent(memory, swap, selectedSwap, memorySize);
 		swap.remove(selectedSwap);
-	}
+    }
 
-	/**
-	 * Moves process allocated at selected partition to backing store
-	 * 
-	 * @throws SoSimException
-	 *             no process is allocated at selected partition
-	 * 
-	 * @see MemStrategy#swapOutProcess(List, List, MemPartition)
-	 */
-	public void swapOutProgramComponent() throws SoSimException {
-		// From memory to backing Store
+    /**
+     * Moves process allocated at selected partition to backing store
+     * 
+     * @throws SoSimException	no process is allocated at selected partition
+     * 
+     * @see MemStrategy#swapOutProcess(List, List, MemPartition)
+     */
+    public void swapOutProgramComponent() throws SoSimException {
+    	// From memory to backing Store
 		algorithm.swapOutProcess(memory, swap, selectedPartition);
-	}
+    }
+    
+    /**
+     * Gets current algorithm information
+     * 
+     * @return current algorithm information
+     * 
+     * @see MemStrategy#getAlgorithmInfo(String, int)
+     */
+    public String getAlgorithmInfo() {
+    	return algorithm.getAlgorithmInfo();
+    }
 
-	/**
-	 * Gets current algorithm information
-	 * 
-	 * @return current algorithm information
-	 * 
-	 * @see MemStrategy#getAlgorithmInfo(String, int)
-	 */
-	public String getAlgorithmInfo() {
-		return algorithm.getAlgorithmInfo();
-	}
+    /**
+     * Forwards simulation time 1 unit. Common tasks such as initial (time 0) state back up, 
+     * release terminated processes from memory and allocate next process into memory according to
+     * concrete strategy. In fixed-size management an additional validation is done at initial time, memory
+     * must be completely partitioned.  Returns true when simulation ends 
+     * (no more processes in any queue)
+     * 
+     * @param time		current simulation time
+     * 
+     * @return simulation ends
+     * 
+     * @see MemStrategy#validateMemory(List, int)
+     * @see MemStrategy#allocateProcess(List, List, ProcessMemUnit, int)
+     */
+    public boolean forwardTime(int time) throws SoSimException {
+    	if (time == 0) {
+    		backup(); // backup to restore initial state
+    		algorithm.validateMemory(memory, memorySize);
+    		if (processQueue.isEmpty()) return true;
+    	} else {
+    		// Release terminated programs from memory 
+    		if (memory.size() > 0) {
+    			releasePrograms(memory); 
+    			releaseVirtualPrograms(virtualmemory);
+    		}
+    		
 
-	/**
-	 * Forwards simulation time 1 unit. Common tasks such as initial (time 0)
-	 * state back up, release terminated processes from memory and allocate next
-	 * process into memory according to concrete strategy. In fixed-size
-	 * management an additional validation is done at initial time, memory must
-	 * be completely partitioned. Returns true when simulation ends (no more
-	 * processes in any queue)
-	 * 
-	 * @param time
-	 *            current simulation time
-	 * 
-	 * @return simulation ends
-	 * 
-	 * @see MemStrategy#validateMemory(List, int)
-	 * @see MemStrategy#allocateProcess(List, List, ProcessMemUnit, int)
-	 */
-	public boolean forwardTime(int time) throws SoSimException {
-		if (time == 0) {
-			backup(); // backup to restore initial state
-			algorithm.validateMemory(memory, memorySize);
-			if (processQueue.isEmpty())
-				return true;
-		} else {
-			// Release terminated programs from memory
-			if (memory.size() > 0) {
-				releasePrograms(memory);
-				releaseVirtualPrograms(virtualmemory);
-			}
+    		// Allocate new programs into memory. Programs ordered by init time
+    		
+    		if (processQueue.size() > 0 ){
+    			if(!algorithm.getAlgorithmInfo().contains("Pagination")) {
+    			algorithm.allocateProcess(memory, swap, processQueue.get(0), memorySize);
+    			//algorithm.allocateVirtualProcess(virtualmemory, swap, processQueue.get(0), 5*memorySize);
+    			processQueue.remove(0);
+    			}
+    			else{
+    				algorithm.allocateVirtualProcess(virtualmemory, swap,processQueue.get(token).getParent(), 5*memorySize);
+    				algorithm.allocateQuantumProcess(memory, swap,processQueue.get(token), memorySize);
+    				if (processQueue.get(token).getParent().isDone()) {
+    					processQueue.remove(token);
+    					if (processQueue.size() == token)
+    						token = 0;
+    				} else {
+    					token++;
+    					token = token % processQueue.size();
+    				}  				
+    			}
+    			
+    		}
+    	}
+    	return false;
+   	}
 
-			// Allocate new programs into memory. Programs ordered by init time
-
-			if (processQueue.size() > 0) {
-				if (!algorithm.getAlgorithmInfo().contains("Pagination")) {
-					algorithm.allocateProcess(memory, swap,
-							processQueue.get(0), memorySize);
-					// algorithm.allocateVirtualProcess(virtualmemory, swap,
-					// processQueue.get(0), 5*memorySize);
-					processQueue.remove(0);
-				} else {
-					algorithm
-							.allocateVirtualProcess(virtualmemory, swap,
-									processQueue.get(token).getParent(),
-									5 * memorySize);
-					algorithm.allocateQuantumProcess(memory, swap,
-							processQueue.get(token), memorySize);
-					if (processQueue.get(token).getParent().isDone()) {
-						processQueue.remove(token);
-						if (processQueue.size() == token)
-							token = 0;
-					} else {
-						token++;
-						token = token % processQueue.size();
-					}
-				}
-
-			}
-		}
-		return false;
-	}
-
-	private void releasePrograms(List<MemPartition> memory) {
-		// Release terminated programs from memory, and decrements duration
-		Iterator<MemPartition> it = memory.iterator();
-		List<ProcessMemUnit> updated = new LinkedList<ProcessMemUnit>();
-
-		while (it.hasNext()) {
-			MemPartition b = it.next();
-			ProcessMemUnit p = b.getAllocated();
-			if (p != null && p.getParent().getDuration() >= 0) { // Duration -1
-																	// infinite
-				if (!updated.contains(p.getParent())) { // Only update program
-														// once
+    private void releasePrograms(List<MemPartition> memory) {
+    	// Release terminated programs from memory, and decrements duration 
+    	Iterator<MemPartition> it = memory.iterator();
+    	List<ProcessMemUnit> updated = new LinkedList<ProcessMemUnit>(); 
+    	
+    	while (it.hasNext()) {
+    		MemPartition b = it.next();
+    		ProcessMemUnit p = b.getAllocated();
+    		if (p != null && p.getParent().getDuration() >= 0) {  // Duration -1 infinite
+				if (!updated.contains(p.getParent())) {  // Only update program once
 					updated.add(p.getParent());
 					p.getParent().setDuration(p.getParent().getDuration() - 1);
 				}
-
-				if (p.getParent().getDuration() == 0) {
-					releaseSwap(p.getParent());
-					b.setAllocated(null);
-				}
-			}
-		}
-	}
-
-	private void releaseVirtualPrograms(List<MemPartition> virtualmemory) {
-		// Release terminated programs from memory, and decrements duration
-		Iterator<MemPartition> it = virtualmemory.iterator();
-		List<ProcessMemUnit> updated = new LinkedList<ProcessMemUnit>();
-
-		while (it.hasNext()) {
-			MemPartition b = it.next();
-			ProcessMemUnit p = b.getAllocated();
-			if (p != null && p.getParent().getDuration() >= 0) { // Duration -1
-																	// infinite
-				if (!updated.contains(p.getParent())) { // Only update program
-														// once
+				
+    			if (p.getParent().getDuration() == 0) {
+    				releaseSwap(p.getParent()); 
+    				b.setAllocated(null);
+    			}
+    		}
+    	}
+    }
+    private void releaseVirtualPrograms(List<MemPartition> virtualmemory) {
+    	// Release terminated programs from memory, and decrements duration 
+    	Iterator<MemPartition> it = virtualmemory.iterator();
+    	List<ProcessMemUnit> updated = new LinkedList<ProcessMemUnit>(); 
+    	
+    	while (it.hasNext()) {
+    		MemPartition b = it.next();
+    		ProcessMemUnit p = b.getAllocated();
+    		if (p != null && p.getParent().getDuration() >= 0) {  // Duration -1 infinite
+				if (!updated.contains(p.getParent())) {  // Only update program once
 					updated.add(p.getParent());
-					// p.getParent().setDuration(p.getParent().getDuration() -
-					// 1);
+					//p.getParent().setDuration(p.getParent().getDuration() - 1);
 				}
-				if (p.getParent().getDuration() == 0) {
-					b.setAllocated(null);
-				}
-			}
-		}
-	}
+    			if (p.getParent().getDuration() == 0) {
+    				b.setAllocated(null);
+    			}
+    		}
+    	}
+    }
+    
+    private void releaseSwap(ProcessComplete p) {
+    	// Release programs components from swap
+    	List<ProcessMemUnit> remove = new LinkedList<ProcessMemUnit>();
 
-	private void releaseSwap(ProcessComplete p) {
-		// Release programs components from swap
-		List<ProcessMemUnit> remove = new LinkedList<ProcessMemUnit>();
-
-		Iterator<ProcessMemUnit> it = swap.iterator();
-		while (it.hasNext()) {
-			ProcessMemUnit pc = it.next();
-			if (pc.getParent().equals(p))
-				remove.add(pc);
-		}
-
-		swap.removeAll(remove);
-	}
-
-	private void backup() {
-		// backup to restore initial state
-		swap.clear();
-		pqBkup.clear();
-		Iterator<ProcessMemUnit> it = processQueue.iterator();
-		while (it.hasNext())
-			pqBkup.add(it.next().clone());
+    	Iterator<ProcessMemUnit> it = swap.iterator();
+    	while (it.hasNext()) {
+    		ProcessMemUnit pc = it.next();
+    		if (pc.getParent().equals(p)) remove.add(pc); 
+    	}
+    	
+    	swap.removeAll(remove);
+    }
+    
+    private void backup() {
+    	// backup to restore initial state
+    	swap.clear();
+    	pqBkup.clear();
+    	Iterator<ProcessMemUnit> it = processQueue.iterator();
+		while (it.hasNext()) pqBkup.add(it.next().clone());
 
 		bqBkup.clear();
 		Iterator<MemPartition> itb = memory.iterator();
-		while (itb.hasNext())
-			bqBkup.add(itb.next().clone());
-
+		while (itb.hasNext()) bqBkup.add(itb.next().clone());
+		
 		bqBkupv.clear();
 		Iterator<MemPartition> itbv = virtualmemory.iterator();
-		while (itbv.hasNext())
-			bqBkupv.add(itbv.next().clone());
+		while (itbv.hasNext()) bqBkupv.add(itbv.next().clone());
+		
+    }
 
-	}
+    /**
+     * Restores model to initial state, time 0
+     * 
+     */
+    public void restoreBackup() {
+    	// Restore initial state (Time 0) from backup's
+    	swap.clear();
+    	processQueue.clear();
+    	processQueue.addAll(pqBkup);
+    	memory.clear();
+    	memory.addAll(bqBkup);
+    	virtualmemory.clear();
+    	virtualmemory.addAll(bqBkupv);
+    	pqBkup.clear();
+    	bqBkup.clear();
+    	bqBkupv.clear();
+    	//backup();
+    }
 
-	/**
-	 * Restores model to initial state, time 0
-	 * 
-	 */
-	public void restoreBackup() {
-		// Restore initial state (Time 0) from backup's
-		swap.clear();
-		processQueue.clear();
-		processQueue.addAll(pqBkup);
-		memory.clear();
-		memory.addAll(bqBkup);
-		virtualmemory.clear();
-		virtualmemory.addAll(bqBkupv);
-		pqBkup.clear();
-		bqBkup.clear();
-		bqBkupv.clear();
-		// backup();
-	}
+	
 
+	
 }
+

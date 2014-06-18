@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Observable;
 import java.util.Properties;
 
+import edu.upc.fib.ossim.mcq.MCQSession;
 import edu.upc.fib.ossim.template.Presenter;
 import edu.upc.fib.ossim.utils.ObservableIdioma;
 
@@ -26,8 +27,10 @@ public class AppSession {
 	private Presenter presenter;
 	private Properties resources;	// resources
 	private Properties properties;	// properties
-	public static final int port = 9000; //port used to block the application from having multiple instances
-
+	public static final int port = 9900; //port used to block the application from having multiple instances
+	private Menu menu;
+	
+	
 	private AppSession() { 
 		idioma = new Locale("en");
 		langNotifier = new ObservableIdioma();
@@ -140,5 +143,19 @@ public class AppSession {
 	 */
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+	}
+	/**
+	 * Setter Menu
+	 * @param menu
+	 */
+	public void setMenu(Menu menu){
+		this.menu = menu;
+	}
+	/**
+	 * return the active instance of menu
+	 * @return menu
+	 */
+	public Menu getMenu(){
+		return menu;
 	}
 }

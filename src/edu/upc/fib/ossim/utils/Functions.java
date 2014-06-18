@@ -18,6 +18,13 @@ import javax.swing.SpringLayout;
 import edu.upc.fib.ossim.AppSession;
 import edu.upc.fib.ossim.disk.DiskPresenter;
 import edu.upc.fib.ossim.filesystem.FileSystemPresenter;
+import edu.upc.fib.ossim.mcq.DiskMCQCreatorPresenter;
+import edu.upc.fib.ossim.mcq.DiskMCQViewPresenter;
+import edu.upc.fib.ossim.mcq.FileSystemMCQCreatorPresenter;
+import edu.upc.fib.ossim.mcq.MemoryMCQCreatorPresenter;
+import edu.upc.fib.ossim.mcq.MemoryMCQViewPresenter;
+import edu.upc.fib.ossim.mcq.ProcessMCQCreatorPresenter;
+import edu.upc.fib.ossim.mcq.ProcessMCQViewPresenter;
 import edu.upc.fib.ossim.memory.MemoryPresenter;
 import edu.upc.fib.ossim.process.ProcessPresenter;
 
@@ -31,7 +38,7 @@ public class Functions {
 	private static final String ROOT="/edu/upc/fib/ossim/";
 	private static final String PATH = "/edu/upc/fib/ossim/img/";
 	private static final String RESOURCES="/edu/upc/fib/ossim/help/resources";
-		
+
 	private Functions() { }
 
 	/**
@@ -45,7 +52,7 @@ public class Functions {
 		}
 		return instance;
 	}
-	
+
 	/**
 	 * Returns help resource (URL format) according to current session language 
 	 * 
@@ -60,9 +67,10 @@ public class Functions {
 		String file = ROOT + helpFile + "_" + AppSession.getInstance().getIdioma().getLanguage() +  ".htm";
 		URL helpURL = getClass().getResource(file);
 		URL url = new URL(helpURL + "#" + reference); // Add reference to scroll
+		System.out.println(url);
 		return url;
 	}
-	
+
 	/**
 	 * Returns resource file URL (At resources folder)
 	 * 
@@ -74,7 +82,7 @@ public class Functions {
 		String file = RESOURCES + "/" + resourceFile;
 		return getClass().getResource(file);
 	}
-	
+
 	/**
 	 * Returns a resource identified by key from resources file. If resource contains \<lang\> it is 
 	 * replace by session language   
@@ -89,7 +97,7 @@ public class Functions {
 		if (resource != null) return resource.replaceFirst("<lang>", AppSession.getInstance().getIdioma().getLanguage());
 		return null;
 	}
-	
+
 	/**
 	 * Returns an application property identified by key from properties file  
 	 * 
@@ -119,8 +127,8 @@ public class Functions {
 		}
 		return property.intValue();
 	}
-	
-	
+
+
 	/**
 	 * Opens a simulation from an xml file
 	 * 
@@ -132,24 +140,64 @@ public class Functions {
 		String sroot = parser.getRoot();
 		if 	(!sroot.equals(getPropertyString("xml_root_pro")) 	&&
 				!sroot.equals(getPropertyString("xml_root_mem")) 	&& 
-				!sroot.equals(getPropertyString("xml_root_fs"))  	&&	
-				!sroot.equals(getPropertyString("xml_root_disk")))
+				!sroot.equals(getPropertyString("xml_root_fs"))  	&&
+				!sroot.equals(getPropertyString("xml_root_mcq_pro"))  	&&
+				!sroot.equals(getPropertyString("xml_root_disk"))   &&
+				!sroot.equals(getPropertyString("xml_root_mcq_dsk"))  &&
+				!sroot.equals(getPropertyString("xml_root_mcq_mem"))&&
+				!sroot.equals(getPropertyString("xml_root_mcq_fs")))
 			throw new SoSimException("all_04");
 
-		if (sroot.equals(getPropertyString("xml_root_pro"))) 
-			AppSession.getInstance().setPresenter(new ProcessPresenter(false)); 
-		if (sroot.equals(getPropertyString("xml_root_mem"))) 
-			AppSession.getInstance().setPresenter(new MemoryPresenter(false));
-		if (sroot.equals(getPropertyString("xml_root_disk"))) 
-			AppSession.getInstance().setPresenter(new DiskPresenter(false)); 
-		if (sroot.equals(getPropertyString("xml_root_fs")))
-			AppSession.getInstance().setPresenter(new FileSystemPresenter(false));
-		
+		if (sroot.equals(getPropertyString("xml_root_pro"))){ 	
+			AppSession.getInstance().getApp().setDefaultSize();
+			AppSession.getInstance().setPresenter(new ProcessPresenter(false)); }
+		if (sroot.equals(getPropertyString("xml_root_mem"))) {
+			AppSession.getInstance().getApp().setDefaultSize();
+			AppSession.getInstance().setPresenter(new MemoryPresenter(false)); }
+		if (sroot.equals(getPropertyString("xml_root_disk"))) {
+			AppSession.getInstance().getApp().setDefaultSize();
+			AppSession.getInstance().setPresenter(new DiskPresenter(false)); }
+		if (sroot.equals(getPropertyString("xml_root_fs"))){
+			AppSession.getInstance().getApp().setDefaultSize();
+			AppSession.getInstance().setPresenter(new FileSystemPresenter(false));}
+		if (sroot.equals(getPropertyString("xml_root_mcq_pro"))){
+			AppSession.getInstance().getApp().setMCQSize();
+			AppSession.getInstance().setPresenter(new ProcessMCQCreatorPresenter(false));}
+		if (sroot.equals(getPropertyString("xml_root_mcq_dsk"))){
+			AppSession.getInstance().getApp().setMCQSize();
+			AppSession.getInstance().setPresenter(new DiskMCQCreatorPresenter(false));}
+		if (sroot.equals(getPropertyString("xml_root_mcq_mem"))){
+			AppSession.getInstance().getApp().setMCQSize();
+			AppSession.getInstance().setPresenter(new MemoryMCQCreatorPresenter(false));}
+		if (sroot.equals(getPropertyString("xml_root_mcq_fs"))){
+			AppSession.getInstance().getApp().setMCQSize();
+			AppSession.getInstance().setPresenter(new FileSystemMCQCreatorPresenter(false));}
 		AppSession.getInstance().getPresenter().loadXML(file);	// Load file
 		AppSession.getInstance().getPresenter().updateInfo(); // Update table info
 		AppSession.getInstance().getPresenter().repaintPainters(); // Repaint painters 
 	}
-	
+
+	public void openMCQSimulation(URL file) throws SoSimException{
+		XMLParserJDOM parser = new XMLParserJDOM(file);
+		String sroot = parser.getRoot();
+		if (	!sroot.equals(getPropertyString("xml_root_mcq_pro"))  	&&
+				!sroot.equals(getPropertyString("xml_root_disk"))   &&
+				!sroot.equals(getPropertyString("xml_root_mcq_dsk"))  &&
+				!sroot.equals(getPropertyString("xml_root_mcq_mem")))
+			throw new SoSimException("all_04");
+		if (sroot.equals(getPropertyString("xml_root_mcq_pro"))){
+			AppSession.getInstance().getApp().setMCQSize();
+			AppSession.getInstance().setPresenter(new ProcessMCQViewPresenter(false));}
+		if (sroot.equals(getPropertyString("xml_root_mcq_dsk"))){
+			AppSession.getInstance().getApp().setMCQSize();
+			AppSession.getInstance().setPresenter(new DiskMCQViewPresenter(false));}
+		if (sroot.equals(getPropertyString("xml_root_mcq_mem"))){
+			AppSession.getInstance().getApp().setMCQSize();
+			AppSession.getInstance().setPresenter(new MemoryMCQViewPresenter(false));}
+		AppSession.getInstance().getPresenter().loadXML(file);	// Load file
+		AppSession.getInstance().getPresenter().updateInfo(); // Update table info
+		AppSession.getInstance().getPresenter().repaintPainters(); // Repaint painters 
+	}
 	/**
 	 * Opens file and loads simulation 
 	 * 
@@ -162,14 +210,14 @@ public class Functions {
 	public void openSimulation(String file) throws SoSimException {
 		try {
 			URL url = getResourceURL(file);
-			
+
 			openSimulation(url);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new SoSimException("all_04");
 		}
 	}
-		
+
 	/**
 	 * Returns an ImageIcon from a file image 
 	 * 
@@ -178,7 +226,7 @@ public class Functions {
 	 */
 	public ImageIcon createImageIcon(String name) {
 		URL imgURL = getClass().getResource(PATH+name);
-		
+
 		if (imgURL != null) {
 			return new ImageIcon(imgURL);
 		} else {
@@ -186,7 +234,7 @@ public class Functions {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Returns an BufferedImage from a file image
 	 * 
@@ -203,7 +251,7 @@ public class Functions {
 		}
 		return img;
 	}
-	
+
 	/**
 	 * Draws a white rectangle filled with a colored texture   
 	 * 
@@ -218,19 +266,19 @@ public class Functions {
 		BufferedImage bi = new BufferedImage(5, 5, BufferedImage.TYPE_INT_RGB);
 		Graphics2D big = bi.createGraphics();
 		big.setColor(Color.white);
-        big.fillRect(0, 0, 7, 7);
-        big.setColor(oval);  
-        big.fillOval(0, 0, 3, 3);
-        TexturePaint f_tp = new TexturePaint(bi, new Rectangle(0,0,5,5));
-        big.dispose();
-	
+		big.fillRect(0, 0, 7, 7);
+		big.setColor(oval);  
+		big.fillOval(0, 0, 3, 3);
+		TexturePaint f_tp = new TexturePaint(bi, new Rectangle(0,0,5,5));
+		big.dispose();
+
 		g2.setPaint(f_tp);
 		g2.fill(new Rectangle(x,y,width, height));
-		
+
 		g2.setColor(Color.black);	
 		g2.draw(new Rectangle(x,y,width, height));
 	}
-	
+
 	/**
 	 * Returns max width of a set of Strings in a concrete Font context
 	 * 
@@ -249,23 +297,23 @@ public class Functions {
 		}
 		return max;
 	}
-	
+
 	/**
-     * Aligns the first <code>rows</code> * <code>cols</code>
-     * components of <code>parent</code> in
-     * a grid. Each component in a column is as wide as the maximum
-     * preferred width of the components in that column;
-     * height is similarly determined for each row.
-     * The parent is made just big enough to fit them all.
-     *
-     * @param parent Container. Layout SpringLayout 		
-     * @param rows number of rows
-     * @param cols number of columns
-     * @param initialX x location to start the grid at
-     * @param initialY y location to start the grid at
-     * @param xPad x padding between cells
-     * @param yPad y padding between cells
-     */
+	 * Aligns the first <code>rows</code> * <code>cols</code>
+	 * components of <code>parent</code> in
+	 * a grid. Each component in a column is as wide as the maximum
+	 * preferred width of the components in that column;
+	 * height is similarly determined for each row.
+	 * The parent is made just big enough to fit them all.
+	 *
+	 * @param parent Container. Layout SpringLayout 		
+	 * @param rows number of rows
+	 * @param cols number of columns
+	 * @param initialX x location to start the grid at
+	 * @param initialY y location to start the grid at
+	 * @param xPad x padding between cells
+	 * @param yPad y padding between cells
+	 */
 	public void makeCompactGrid(Container parent,
 			int rows, int cols,
 			int initialX, int initialY,

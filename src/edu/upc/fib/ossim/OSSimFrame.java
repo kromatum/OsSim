@@ -25,14 +25,15 @@ public class OSSimFrame extends JFrame implements OSSim {
 	} 
 
 	private void initialize() { 
-		this.setTitle("OS Sim"); 
-		this.setSize(1000,800); //Mida 
+		this.setTitle("OS Project"); 
+		this.setSize(800,600); //Mida 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-		this.setResizable(true);
+		this.setResizable(false);
 		AppSession.getInstance().setApp(this);
 		Menu menu = new Menu();
 		this.setJMenuBar(menu);
 		this.setContentPane(new Home(menu));
+		AppSession.getInstance().setMenu(menu);
 		this.setVisible(true); // Propietat de visibilitat 
 	} 
 
@@ -94,5 +95,19 @@ public class OSSimFrame extends JFrame implements OSSim {
 	 */
 	public boolean allowOpenSave() {
 		return true;
+	}
+
+	@Override
+	public void setMCQSize() {
+		// TODO Auto-generated method stub
+		this.setSize(1100,600); //Mida 
+		repaint();
+	}
+
+	@Override
+	public void setDefaultSize() {
+		// TODO Auto-generated method stub
+		this.setSize(800,600);
+		repaint();
 	}
 } 
