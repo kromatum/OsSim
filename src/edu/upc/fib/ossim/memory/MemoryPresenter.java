@@ -53,7 +53,7 @@ public class MemoryPresenter extends Presenter  {
 	private static final int INFO_HEIGTH = 200;
 	public static final int MEMORY_WIDTH = 180;
 	public static final int MEMORY_HEIGHT = 380;
-	public static final int PROGRAMS_WIDTH = 300;
+	public static final int PROGRAMS_WIDTH = 365;
 	public static final int PROGRAMS_HEIGHT = 200;
 	public static final int LEGEND_WIDTH = 240;
 	public static final int LEGEND_HEIGTH = 30;

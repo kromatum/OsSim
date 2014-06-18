@@ -81,7 +81,7 @@ public class PanelMemory extends PanelTemplate {
 		scroll1.setPreferredSize(new Dimension(MemoryPresenter.PROGRAMS_WIDTH+10, MemoryPresenter.PROGRAMS_HEIGHT+10));
 		layout.putConstraint(SpringLayout.WEST, scroll1, 10, SpringLayout.EAST, scroll0);
 		layout.putConstraint(SpringLayout.NORTH,scroll1, 0, SpringLayout.NORTH, scroll0);
-		layout.putConstraint(SpringLayout.EAST,scroll1, -10, SpringLayout.EAST, pane);
+		//layout.putConstraint(SpringLayout.EAST,scroll1, -10, SpringLayout.EAST, pane);
 		pane.add(scroll1);
 
 		SwapPainter swap = (SwapPainter) presenter.getPainter(MemoryPresenter.SWAP_PAINTER);
@@ -89,7 +89,7 @@ public class PanelMemory extends PanelTemplate {
 		scroll2.setPreferredSize(new Dimension(MemoryPresenter.PROGRAMS_WIDTH+10, MemoryPresenter.PROGRAMS_HEIGHT+10));
 		layout.putConstraint(SpringLayout.WEST, scroll2, 0, SpringLayout.WEST, scroll1);
 		layout.putConstraint(SpringLayout.NORTH,scroll2, 10, SpringLayout.SOUTH, scroll1);
-		layout.putConstraint(SpringLayout.EAST,scroll2, -10, SpringLayout.EAST, pane);
+		//layout.putConstraint(SpringLayout.EAST,scroll2, -10, SpringLayout.EAST, pane);
 		pane.add(scroll2);
 	}
 
