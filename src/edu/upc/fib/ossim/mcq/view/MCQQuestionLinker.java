@@ -7,25 +7,30 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -40,6 +45,27 @@ import edu.upc.fib.ossim.utils.SoSimException;
 import edu.upc.fib.ossim.utils.XMLParserJDOM;
 
 public class MCQQuestionLinker extends EscapeDialog{
+	
+	public class CustomTableModel extends DefaultTableModel {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		
+		public CustomTableModel(String[] columnNames, int i) {
+			// TODO Auto-generated constructor stub
+			super(columnNames,i);
+		}
+
+		@Override
+		public boolean isCellEditable(int row, int column) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		
+		
+	}
 	/**
 	 * 
 	 */
@@ -48,13 +74,17 @@ public class MCQQuestionLinker extends EscapeDialog{
 	private JLabel LPATH = new JLabel("Path: "+PATH);
 	private JFileChooser chooser = null;
 	
-	@SuppressWarnings("rawtypes")
-	private JList existingList = null;
-	private DefaultListModel<String> existingModel = null;
+	private String[] columnNames = {"Question",
+            "Difficulty"};
 	
-	@SuppressWarnings("rawtypes")
-	private JList mcqList = null;
-	private DefaultListModel<String> mcqModel = null;
+	
+	private JTable existingTable = null;
+	private CustomTableModel existingTableModel = new CustomTableModel(columnNames, 0);
+	
+	
+	private JTable mcqTable = null;
+	private CustomTableModel mcqTableModel = new CustomTableModel(columnNames, 0);
+	
 	
 	private JButton up = null;
 	private JButton down = null;
@@ -62,9 +92,15 @@ public class MCQQuestionLinker extends EscapeDialog{
 	private JButton remove = null;
 	private JButton browse = null;
 	private static MCQQuestionLinker instance = null;
-	private Hashtable<String,URL> questionTable = new Hashtable<String,URL>();
+	private Hashtable<String,URL> mcqHashTable = new Hashtable<String,URL>();
+	private Hashtable<String,URL> existingHashTable = new Hashtable<String,URL>();
 	private JButton browseFile = null;
 	private File saveFile = null;
+	
+	
+	
+	static Boolean isEditing = false;
+	URL edited = null;
 	
 	private class saveListener implements ActionListener{
 		@Override
@@ -94,8 +130,9 @@ public class MCQQuestionLinker extends EscapeDialog{
 				PATH = myFile.getPath();
 				LPATH.setText("Path: "+PATH);
 				System.out.println(PATH);
-				existingModel.clear();
+				existingTableModel.getDataVector().clear();
 				fillModel();
+				revalidate();
 			}
 		}
 		
@@ -104,86 +141,133 @@ public class MCQQuestionLinker extends EscapeDialog{
 	
 	private class addListener implements ActionListener{
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			@SuppressWarnings("rawtypes")
-			List selected = existingList.getSelectedValuesList();
-			for(Object it : selected){
-				mcqModel.addElement((String) it);
-				existingModel.removeElement(it);
-			}
-			existingList.updateUI();
-			mcqList.updateUI();
+			String s = (String) existingTableModel.getValueAt(existingTable.getSelectedRow(), 0);
+			Object o = existingTableModel.getDataVector().remove(existingTable.getSelectedRow());
+			mcqTableModel.getDataVector().add(o);
+			mcqHashTable.put(s, existingHashTable.get(s));
+			existingHashTable.remove(s);
+			
+			
+			existingTable.updateUI();
+			mcqTable.updateUI();
 		}
 	}
 	private class removeListener implements ActionListener{
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			@SuppressWarnings("rawtypes")
-			List selected = mcqList.getSelectedValuesList();
-			for(Object it : selected){
-				existingModel.addElement((String) it);
-				mcqModel.removeElement(it);
-			}
-			existingList.updateUI();
-			mcqList.updateUI();
+			
+			if(mcqTable.getSelectedRow()<0 || mcqTable.getSelectedRow()>=mcqTable.getRowCount())
+				return;
+			String s = (String) mcqTableModel.getValueAt(mcqTable.getSelectedRow(), 0);
+			System.out.println(s);
+			existingHashTable.put(s,mcqHashTable.get(s));
+			mcqHashTable.remove(s);
+			Object o = mcqTableModel.getDataVector().remove(mcqTable.getSelectedRow());
+			existingTableModel.getDataVector().add(o);
+			
+			
+			existingTable.updateUI();
+			mcqTable.updateUI();
 			
 		}
 	}
 	private class moveUpListener implements ActionListener{
+		@SuppressWarnings("unchecked")
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
-			List selected = mcqList.getSelectedValuesList();
-			for(Object it : selected){
-				String toChange = mcqModel.elementAt(mcqModel.indexOf(it));
-				int index = mcqModel.indexOf(it);
-				if(index>0){
-					mcqModel.remove(index);
-					mcqModel.add(index-1, toChange);
-					mcqList.setSelectedIndex(index-1);
-				}
-				
-			}
+			
+			int pos = mcqTable.getSelectedRow();
+			if (pos < 0 || pos >mcqTable.getRowCount())
+				return;
+			Object o = mcqTableModel.getDataVector().remove(pos);
+			mcqTableModel.getDataVector().add(pos-1, o);
+			mcqTable.updateUI();
+			
 		}
 	}
 	private class MoveDownListener implements ActionListener {
+		@SuppressWarnings("unchecked")
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
-			List selected = mcqList.getSelectedValuesList();
-			for(Object it : selected){
-				String toChange = mcqModel.elementAt(mcqModel.indexOf(it));
-				int index = mcqModel.indexOf(it);
-				if(index < mcqModel.getSize()-1){
-					mcqModel.remove(index);
-					mcqModel.add(index+1, toChange);
-					mcqList.setSelectedIndex(index+1);
-					
-				}
-				
-			}
+			
+			int pos = mcqTable.getSelectedRow();
+			if (pos < 0 || pos >mcqTable.getRowCount())
+				return;
+			Object o = mcqTableModel.getDataVector().remove(pos);
+			mcqTableModel.getDataVector().add(pos+1, o);
+			mcqTable.updateUI();
+			
 		}
 	}
 	
-	
-	
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private MCQQuestionLinker(){
 		super();
 		setTitle("MCQ Creator Tool");
 		
-		existingModel = new DefaultListModel<String>();
 		fillModel();
-		existingList = new JList(existingModel);
-		existingList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		
-		mcqModel = new DefaultListModel<String>();
-		mcqList = new JList(mcqModel);
-		mcqList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		existingTable =  new JTable(existingTableModel);
+		existingTable.setShowVerticalLines(false);
+		existingTable.setShowHorizontalLines(false);
+		existingTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		existingTable.setSelectionModel(new DefaultListSelectionModel());
+		existingTable.setColumnSelectionAllowed(false);
+		existingTable.addMouseListener(new MouseAdapter(){
+			 @Override
+			    public void mouseReleased(MouseEvent e) {
+			        int r = existingTable.rowAtPoint(e.getPoint());
+			        if (r >= 0 && r < existingTable.getRowCount()) {
+			        	existingTable.setRowSelectionInterval(r, r);
+			        } else {
+			        	existingTable.clearSelection();
+			        }
+
+			        int rowindex = existingTable.getSelectedRow();
+			        if (rowindex < 0)
+			            return;
+			        if (e.isPopupTrigger() && e.getComponent() instanceof JTable ) {
+			            JPopupMenu popup = createYourPopUp(existingTable,existingHashTable);
+			            popup.show(e.getComponent(), e.getX(), e.getY());
+			        }
+			    }
+		});
+		
+		
+		
+		
+		mcqTable =  new JTable(mcqTableModel);
+		mcqTable.setShowVerticalLines(false);
+		mcqTable.setShowHorizontalLines(false);
+		mcqTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		mcqTable.setSelectionModel(new DefaultListSelectionModel());
+		mcqTable.setColumnSelectionAllowed(false);
+		mcqTable.addMouseListener(new MouseAdapter(){
+			 @Override
+			    public void mouseReleased(MouseEvent e) {
+			        int r = mcqTable.rowAtPoint(e.getPoint());
+			        if (r >= 0 && r < mcqTable.getRowCount()) {
+			        	mcqTable.setRowSelectionInterval(r, r);
+			        } else {
+			        	mcqTable.clearSelection();
+			        }
+
+			        int rowindex = mcqTable.getSelectedRow();
+			        if (rowindex < 0)
+			            return;
+			        if (e.isPopupTrigger() && e.getComponent() instanceof JTable ) {
+			            JPopupMenu popup = createYourPopUp(mcqTable,mcqHashTable);
+			            popup.show(e.getComponent(), e.getX(), e.getY());
+			        }
+			    }
+		});
 		
 		up = new JButton("↑");
 		up.setFont(up.getFont().deriveFont(18.0f));
@@ -210,8 +294,6 @@ public class MCQQuestionLinker extends EscapeDialog{
 		buttonPanel.add(new JLabel(" "));
 		buttonPanel.add(down);
 		
-		//add(buttonPanel);
-		add(new JScrollPane(existingList));
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.LINE_AXIS));
 		JPanel pathPanel = new JPanel (new FlowLayout(FlowLayout.LEFT));
@@ -233,10 +315,11 @@ public class MCQQuestionLinker extends EscapeDialog{
 		setMinimumSize(new Dimension(500, 500));  // hardCoded sizing
 		
 		this.setLocationRelativeTo((Frame)AppSession.getInstance().getApp());
-		JScrollPane existingListScrollPane = new JScrollPane(existingList);
+		JScrollPane existingListScrollPane = new JScrollPane(existingTable);
 		existingListScrollPane.setBorder(BorderFactory.createTitledBorder("Available Questions:"));
 		
-		JScrollPane mcqListScrollPane = new JScrollPane(mcqList);
+		//JScrollPane mcqListScrollPane = new JScrollPane(mcqList);
+		JScrollPane mcqListScrollPane = new JScrollPane(mcqTable);
 		mcqListScrollPane.setBorder(BorderFactory.createTitledBorder("Chosen Questions:"));
 		
 		JPanel centerPanel = new JPanel();
@@ -259,7 +342,36 @@ public class MCQQuestionLinker extends EscapeDialog{
 		add(savePanel,BorderLayout.SOUTH);
 		setVisible(true);
 	}
-	public static MCQQuestionLinker getMCQQuestionLinker(){
+	
+	public void initComponents(){
+		
+	}
+	protected JPopupMenu createYourPopUp(final JTable table, final Hashtable<String, URL> hash){
+		// TODO Auto-generated method stub
+		JPopupMenu menu = new JPopupMenu();
+		JMenuItem menuItem = new JMenuItem("Edit",Functions.getInstance().createImageIcon("pen2.png"));
+	   menuItem.addActionListener(new ActionListener() {
+		
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			isEditing = true;
+			try {
+				edited = hash.get(table.getModel().getValueAt(table.getSelectedRow(), 0));
+				Functions.getInstance().openSimulation(edited);
+				AppSession.getInstance().getMenu().allowSaving();
+			} catch (SoSimException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	});
+		menu.add(menuItem);
+		
+		
+		return menu;
+	}
+	public static MCQQuestionLinker getInstance(){
 		if(instance==null) instance = new MCQQuestionLinker();
 		return instance;
 	}
@@ -267,7 +379,7 @@ public class MCQQuestionLinker extends EscapeDialog{
 	
 	private void fillModel(){
 		File dir = new File(PATH);
- 
+		existingTableModel.getDataVector().clear();
 		// list out all the file name and filter by the extension
 		File[] list = dir.listFiles(new FilenameFilter() {
 			
@@ -284,41 +396,47 @@ public class MCQQuestionLinker extends EscapeDialog{
 				parser = new XMLParserJDOM(list[it].toURI().toURL());
 				String sroot = parser.getRoot();
 				String question = null;
+				String difficulty = "5";
 				if (sroot.equals(Functions.getInstance().getPropertyString("xml_root_mcq_pro"))){
 					question = parser.getElements("mcq").get(0).get(1).get(1);
-					
+					difficulty = parser.getElements("mcq").get(0).get(6).get(1);
 				}
 				if(sroot.equals(Functions.getInstance().getPropertyString("xml_root_mcq_dsk"))){
 					question = parser.getElements("mcq").get(0).get(1).get(1);
-					
+					difficulty = parser.getElements("mcq").get(0).get(6).get(1);
 				}
 				if(sroot.equals(Functions.getInstance().getPropertyString("xml_root_mcq_mem"))){
 					question = parser.getElements("mcq").get(0).get(1).get(1);
+					difficulty = parser.getElements("mcq").get(0).get(6).get(1);
+				}
+				if(sroot.equals(Functions.getInstance().getPropertyString("xml_root_mcq_fs"))){
+					question = parser.getElements("mcq").get(0).get(1).get(1);
+					difficulty = parser.getElements("mcq").get(0).get(6).get(1);
 				}
 				if(question !=null){
-					existingModel.addElement(question);
-					System.out.println(question);
-					questionTable.put(question, list[it].toURI().toURL());
+					Object[] o = {question,difficulty};
+					existingTableModel.addRow(o);
+						
+					existingHashTable.put(question, list[it].toURI().toURL());
 				}
-				
 			} catch (MalformedURLException | SoSimException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		existingTableModel.fireTableDataChanged();
 		
 	}
 	private void saveQuestionList(){
-		Object[] selected = mcqModel.toArray();
 		Element root = new Element("MCQ_URLs");
 		Document doc = new Document(root);
-		root.setAttribute("totalQuestions", ""+selected.length);
+		root.setAttribute("totalQuestions", ""+mcqTable.getRowCount());
 		doc.setRootElement(root);
 		Element url =null;
-		for(Object it : selected){
+		Enumeration<URL> enumeration = mcqHashTable.elements();
+		while(enumeration.hasMoreElements()){
 			url = new Element("URL");
-			url.addContent(new Element("Value").setText((questionTable.get(it).getFile()).substring(1).replace("%20", " ")));
-			System.out.println(questionTable.get(it).getFile());
+			url.addContent(new Element("Value").setText((enumeration.nextElement().getFile()).substring(1).replace("%20", " ")));
 			doc.getRootElement().addContent(url);
 		}
 		XMLOutputter xmlOutput = new XMLOutputter();
@@ -340,6 +458,19 @@ public class MCQQuestionLinker extends EscapeDialog{
 
 		
 		
+	}
+	public static void destroyInstance(){
+		instance = null;
+	}
+	
+	public static boolean isEditing(){
+		return isEditing;
+	}
+	public static void doneEditing(){
+		if(instance!=null){
+			isEditing = false;
+			instance.setVisible(true);
+		}
 	}
 	
 	

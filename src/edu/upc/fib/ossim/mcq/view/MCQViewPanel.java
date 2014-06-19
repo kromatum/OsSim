@@ -14,6 +14,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -98,10 +99,10 @@ public class MCQViewPanel extends JPanel implements ActionListener{
 		setLayout(new BoxLayout(this,BoxLayout.PAGE_AXIS));
 		TitledBorder questionBorder = BorderFactory.createTitledBorder(lquestion);
 		JLabel nbrquestion = new JLabel("Question : "+ MCQSession.getInstance().getMCQChooserDialog().getQuestionNumber() +" / "+MCQSession.getInstance().getMCQChooserDialog().getMaxQuestions());
-		JLabel time = new JLabel("Time:");
-		JPanel infoPanel = new JPanel(new GridLayout(2,1));
+		//JLabel time = new JLabel("Time:");
+		JPanel infoPanel = new JPanel(new GridLayout(1,1));
 		infoPanel.add(nbrquestion);
-		infoPanel.add(time);
+		//infoPanel.add(time);
 		this.add(infoPanel);
 		JPanel questionPanel = new JPanel();
 		questionPanel.setBorder(questionBorder);
@@ -115,7 +116,7 @@ public class MCQViewPanel extends JPanel implements ActionListener{
 		if(type == true){
 			JPanel pair = null;
 			for(int it = 0; it<nbrAnswers ; it++){
-				pair = new JPanel(new FlowLayout());
+				pair = new JPanel(new FlowLayout(FlowLayout.LEFT));
 				pair.add(radioGroup.get(it));
 				pair.add(answerGroup.get(it));
 				answerPanel.add(pair);
@@ -196,22 +197,18 @@ public class MCQViewPanel extends JPanel implements ActionListener{
 			}
 			else{
 				saveAnswer();
-				for(int it = 0 ; it < AppSession.getInstance().getMenu().getMenuCount() ; it++){
-					try{
-						AppSession.getInstance().getMenu().getMenu(it).setEnabled(true);
-					}catch(Exception exc){
-						//WEIRD BUG, Apparantly the code says there are 14 Menus available where in fact only 5 exists
-						System.out.println(it);
-					}
-
-				}
-
-
-				AppSession.getInstance().getMenu().getMenu(0).getItem(3).doClick();
-				if(AppSession.getInstance().getPresenter()==null){
+				int dialogResult = JOptionPane.showConfirmDialog (null, "Are You sure You want to end the test?","Warning",JOptionPane.YES_NO_OPTION);
+				if(dialogResult == JOptionPane.YES_OPTION){
+					AppSession.getInstance().getMenu().home();
 					MCQSession.getInstance().saveXML();
 					MCQSession.destroyInstance();
-
+					for(int it = 0 ; it < AppSession.getInstance().getMenu().getMenuCount() ; it++){
+						try{
+						AppSession.getInstance().getMenu().getMenu(it).setEnabled(true);
+						}catch(Exception exc){
+							//WEIRD BUG, Apparantly the code says there are 14 Menus available where in fact only 5 exists
+						}
+					}
 				}
 
 			}

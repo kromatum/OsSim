@@ -7,16 +7,16 @@ import edu.upc.fib.ossim.template.Presenter;
 
 public class PanelMCQViewFileSystem extends PanelFileSystem{
 
+	public PanelMCQViewFileSystem(Presenter presenter) {
+		super(presenter);
+		// TODO Auto-generated constructor stub
+	}
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 
-	public PanelMCQViewFileSystem(Presenter presenter) {
-		super(presenter);
-		// TODO Auto-generated constructor stub
-	}
 
 	
 	public void addmcqViewPanel(MCQViewPanel mcqViewPanel){

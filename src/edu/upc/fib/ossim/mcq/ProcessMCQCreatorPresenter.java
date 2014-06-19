@@ -48,22 +48,28 @@ public class ProcessMCQCreatorPresenter extends ProcessPresenter{
 		else{
 			int blockOnStep = new Integer (data.get(0).get(3).get(1)).intValue();
 			int nbrAnswers = new Integer(data.get(0).get(4).get(1)).intValue();
-			boolean includeAnswers = data.get(0).get(5).get(1).equals(true);
+			boolean includeAnswers = data.get(0).get(5).get(1).equals("true");
+			System.out.println(includeAnswers);
 			String question = data.get(0).get(1).get(1);
 			ArrayList<String> answers = new ArrayList<String>();
 			int answerType = Integer.parseInt(data.get(0).get(2).get(1));
 			ArrayList<Boolean> answerbool = new ArrayList<Boolean>();
+			int difficulty = new Integer(data.get(0).get(6).get(1)).intValue();
 			for(int it = 1 ; it <= nbrAnswers; it++){
-				answers.add(data.get(it).get(1).get(1));
-				if(answerType!=3)
+				if(answerType!=3){
+					answers.add(data.get(it).get(1).get(1));
 					if(includeAnswers){
 						if(data.get(it).get(2).get(1).equals("true"))
 							answerbool.add(new Boolean(true));
 						else
 							answerbool.add(new Boolean(false));
 					}
+				}
+				else{
+					answers.add(data.get(it).get(2).get(1));
+				}
 			}
-			MCQSession.getInstance().getmcqCreationPanel().fillData(question, answers, answerbool,includeAnswers,blockOnStep);
+			MCQSession.getInstance().getmcqCreationPanel().fillData(question,answerType, answers, answerbool,includeAnswers,blockOnStep,difficulty);
 		}
 	}
 }

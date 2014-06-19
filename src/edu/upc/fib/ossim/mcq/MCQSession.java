@@ -51,6 +51,9 @@ public class MCQSession {
 			mcqViewPanel = new MCQViewPanel();
 		return mcqViewPanel;
 	}
+	public void destroyMCQViewPanel(){
+		mcqViewPanel = null;
+	}
 
 	public static MCQSession getInstance(){
 		if(instance == null) instance = new MCQSession();

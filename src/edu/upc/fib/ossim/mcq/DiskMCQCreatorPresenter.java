@@ -1,9 +1,12 @@
 package edu.upc.fib.ossim.mcq;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import edu.upc.fib.ossim.AppSession;
 import edu.upc.fib.ossim.disk.DiskPresenter;
+import edu.upc.fib.ossim.mcq.view.MCQQuestionLinker;
 import edu.upc.fib.ossim.mcq.view.PanelMCQCreatorDisk;
 import edu.upc.fib.ossim.template.view.PanelTemplate;
 import edu.upc.fib.ossim.utils.Functions;
@@ -42,6 +45,9 @@ public class DiskMCQCreatorPresenter extends DiskPresenter{
 		}
 		return data;
 	}
+	
+	
+	
 	@Override
 	public void putXMLData(int child, Vector<Vector<Vector<String>>> data) throws SoSimException {
 		System.out.println(data);
@@ -50,25 +56,29 @@ public class DiskMCQCreatorPresenter extends DiskPresenter{
 		else{
 			int blockOnAnswer = new Integer(data.get(0).get(3).get(1)).intValue();
 			int nbrAnswers = new Integer(data.get(0).get(4).get(1)).intValue();
-			boolean includeAnswers = data.get(0).get(5).get(1).equals(true);
+			boolean includeAnswers = data.get(0).get(5).get(1).equals("true");
 			String question = data.get(0).get(1).get(1);
 			ArrayList<String> answers = new ArrayList<String>();
 			System.out.println("Question: " + data.get(0).get(1).get(1));
 			System.out.println("AnswerType:" + data.get(0).get(2).get(1));
 			int answerType = Integer.parseInt(data.get(0).get(2).get(1));
 			ArrayList<Boolean> answerbool = new ArrayList<Boolean>();
-			for(int it = 1; it <= nbrAnswers; it++){
-				answers.add(data.get(it).get(1).get(1));
-				System.out.println("Answer:" + data.get(it).get(1).get(1));	
-				if(answerType!=3)
+			int difficulty = new Integer(data.get(0).get(6).get(1)).intValue();
+			for(int it = 1 ; it <= nbrAnswers; it++){
+				if(answerType!=3){
+					answers.add(data.get(it).get(1).get(1));
 					if(includeAnswers){
 						if(data.get(it).get(2).get(1).equals("true"))
 							answerbool.add(new Boolean(true));
 						else
 							answerbool.add(new Boolean(false));
 					}
-			}
-			MCQSession.getInstance().getmcqCreationPanel().fillData(question, answers, answerbool,includeAnswers, blockOnAnswer);
+				}
+				else{
+					answers.add(data.get(it).get(2).get(1));
+				}
+			}	
+			MCQSession.getInstance().getmcqCreationPanel().fillData(question,answerType, answers, answerbool,includeAnswers, blockOnAnswer,difficulty);
 		}
 	}
 

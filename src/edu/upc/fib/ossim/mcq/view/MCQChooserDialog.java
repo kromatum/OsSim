@@ -21,6 +21,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import edu.upc.fib.ossim.AppSession;
+import edu.upc.fib.ossim.mcq.MCQSession;
 import edu.upc.fib.ossim.utils.EscapeDialog;
 import edu.upc.fib.ossim.utils.Functions;
 import edu.upc.fib.ossim.utils.SoSimException;
@@ -59,12 +60,10 @@ public class MCQChooserDialog extends EscapeDialog implements HyperlinkListener{
 	}
 
 	private void loadSimulation(URL resource) {
-		this.dispose();
-
+		this.setVisible(false);
 
 		if (AppSession.getInstance().getPresenter() != null) 
 			AppSession.getInstance().getPresenter().closeInfo();
-
 		try {
 			Functions.getInstance().openMCQSimulation(resource);
 		} catch (SoSimException ex) {
@@ -108,7 +107,7 @@ public class MCQChooserDialog extends EscapeDialog implements HyperlinkListener{
 	public void getNext(){
 		
 		try {
-			
+			MCQSession.getInstance().destroyMCQViewPanel();
 			questionNumber++;
 			System.out.println("Next:" + paths.get(questionNumber-1));
 			loadSimulation((new File(paths.get(questionNumber-1)).toURI().toURL()));
@@ -129,10 +128,10 @@ public class MCQChooserDialog extends EscapeDialog implements HyperlinkListener{
 	public void getPrevious(){
 		
 		try {
-			
+			MCQSession.getInstance().destroyMCQViewPanel();
 			questionNumber--;
 			System.out.println("Previous:" + paths.get(questionNumber-1));
-			loadSimulation((new File(paths.get(questionNumber)).toURI().toURL()));
+			loadSimulation((new File(paths.get(questionNumber-1)).toURI().toURL()));
 			
 
 		} catch (MalformedURLException e) {
@@ -162,6 +161,7 @@ public class MCQChooserDialog extends EscapeDialog implements HyperlinkListener{
 				paths.add(eElement.getElementsByTagName("Value").item(0).getTextContent());
 				
 			}	
+			System.out.println(paths);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

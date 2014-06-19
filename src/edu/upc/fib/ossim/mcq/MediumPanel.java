@@ -72,7 +72,7 @@ public class MediumPanel extends EscapeDialog implements ActionListener{
 
 		lnbrAnswers = new JLabel("Number of Answers:");
 		SpinnerModel spmodel = new SpinnerNumberModel(2, //initial value
-				1, //min
+				2, //min
 				10, //max
 				1);
 		nbrAnswers = new JSpinner(spmodel);

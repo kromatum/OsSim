@@ -78,6 +78,7 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 	private JMenuItem exitMenuItem = null; 
 	private JMenuItem openMenuItem = null;
 	private JMenuItem saveMenuItem = null;
+	private JMenuItem saveasMenuItem = null;
 	private JMenuItem homeMenuItem = null;
 	private JMenuItem simProcsMenuItem = null;
 	private JMenuItem simMemMenuItem = null;
@@ -117,6 +118,7 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 		actions.put("exit", 1);
 		actions.put("open", 2);
 		actions.put("save", 3);
+		actions.put("saveas", 74);
 		actions.put("home", 4);
 		actions.put("about", 5);
 		actions.put("help", 6);
@@ -175,6 +177,14 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 		saveMenuItem.setEnabled(false); // Disabled until opening any simulation
 		fileMenu.add(saveMenuItem); 
 
+		saveasMenuItem = new JMenuItem(); 
+		saveasMenuItem.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
+		saveasMenuItem.setText("Save As..."); // Save simulation 
+		saveasMenuItem.setActionCommand("saveas");
+		saveasMenuItem.addActionListener(this);
+		saveasMenuItem.setEnabled(false); // Disabled until opening any simulation
+		fileMenu.add(saveasMenuItem); 
+		
 		homeMenuItem = new JMenuItem(); 
 		homeMenuItem.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
 		homeMenuItem.setText(Translation.getInstance().getLabel("all_14")); 
@@ -402,11 +412,7 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 				break;
 			case 4:	// home
 				
-				if (AppSession.getInstance().getPresenter() != null)  AppSession.getInstance().getPresenter().closeInfo();
-				AppSession.getInstance().setPresenter(null);
-				saveMenuItem.setEnabled(false);
-				AppSession.getInstance().getApp().setDefaultSize();
-				AppSession.getInstance().getApp().loadView(new Home(this));
+				home();
 				break;
 			case 5:	// about
 				AppSession.getInstance().getApp().showMessage("<html>OS Sim v1.2<br/> Operating System Concepts Simulator<br/>Freely available for all uses under BSD license<br/>Alex Macia</html>");
@@ -497,7 +503,8 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 				break;
 				
 			case 57:
-				MCQQuestionLinker linker = MCQQuestionLinker.getMCQQuestionLinker();
+				MCQQuestionLinker.destroyInstance();
+				MCQQuestionLinker linker = MCQQuestionLinker.getInstance();
 				linker.setVisible(true);
 				MCQSession.getInstance().getMediumPanel().setVisible(false);
 				break;
@@ -529,12 +536,27 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 				exercisesPanel.setVisible(false);
 				exercisesPanel.scrollToKey(scroll);
 				break;
+			case 74:
+				if (AppSession.getInstance().getPresenter() != null) AppSession.getInstance().getPresenter().actionPerformed(e);
+				break;
 			}
 
 			if (AppSession.getInstance().getPresenter() != null 
 					&& !saveMenuItem.isEnabled() 
-					&& AppSession.getInstance().getApp().allowOpenSave()) saveMenuItem.setEnabled(true);
+					&& AppSession.getInstance().getApp().allowOpenSave()) {
+				saveMenuItem.setEnabled(true); saveasMenuItem.setEnabled(true);
+			}
 		}
+	}
+
+	public void home() {
+		// TODO Auto-generated method stub
+		if (AppSession.getInstance().getPresenter() != null)  AppSession.getInstance().getPresenter().closeInfo();
+		AppSession.getInstance().setPresenter(null);
+		saveMenuItem.setEnabled(false);
+		saveasMenuItem.setEnabled(false);
+		AppSession.getInstance().getApp().setDefaultSize();
+		AppSession.getInstance().getApp().loadView(new Home(this));
 	}
 
 	/**
@@ -578,5 +600,8 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 		exercisesFs.setText(Translation.getInstance().getLabel("all_59"));
 		exercisesDisk.setText(Translation.getInstance().getLabel("all_57"));
 
+	}
+	public void allowSaving(){
+		saveMenuItem.setEnabled(true); saveasMenuItem.setEnabled(true);
 	}
 }
