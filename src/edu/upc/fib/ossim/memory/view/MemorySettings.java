@@ -36,7 +36,7 @@ import edu.upc.fib.ossim.utils.Translation;
  */
 public class MemorySettings extends SettingsTemplate { 
 	private static final long serialVersionUID = 1L;
-	public static final int MIN_MEMSIZE = 64;
+	public static final int MIN_MEMSIZE = 10;
 	public static final int MAX_MEMSIZE = 256;
 	public static final Integer[] SO_VALUES = {1, 2, 4};
 	private static final Integer[] PAGE_SIZE = {1, 2, 4};

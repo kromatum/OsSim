@@ -51,7 +51,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 		memory.clear();
 		// Create a memory frames, size = page size
 		int end = 0;
-		while (end <  10) {
+		while (end <  memory_size) {
 			MemPartition b = new MemPartition(end, pageSize);
 			memory.add(b);
 			end += pageSize;
