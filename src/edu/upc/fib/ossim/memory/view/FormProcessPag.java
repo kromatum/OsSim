@@ -118,7 +118,7 @@ public class FormProcessPag extends FormProcess {
 	public void initQuantum(Vector<Object> values) {
 		grid.add(new JLabel("quantum"));
 		SpinnerModel spmodel;
-		if (values.size() > 1) spmodel = new SpinnerNumberModel(new Integer(values.get(7).toString()).intValue(), 1, 4, 1);
+		if (values.size() > 1) spmodel = new SpinnerNumberModel(new Integer(values.get(7).toString()).intValue(), 1, 10, 1);
 		else spmodel = new SpinnerNumberModel(1, 1,10, 1);
 		quantum = new JSpinner(spmodel);
 		JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) quantum.getEditor();

@@ -457,9 +457,10 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     		child = values.get(j);
     		((ProcessComponent) child).setTime(0);
     		addOtherTime(memory,child);
-    		if(swap.contains(child)) this.swapInProcessComponent(memory, swap, child, memory_size);
+    		boolean inMemory = isInMemory(memory,child);
+    		if(inMemory==false&&swap.contains(child)) this.swapInProcessComponent(memory, swap, child, memory_size);
     		else{
-    		if (((ProcessComponent) child).isLoad()&&!isInMemory(memory,child)) { // Should be allocated   			
+    		if (((ProcessComponent) child).isLoad()&&inMemory ==false) { // Should be allocated   			
         		int i = 0;	
         		MemPartition candidate = null;
         		while (i<memOrdered.length && candidate == null) {
