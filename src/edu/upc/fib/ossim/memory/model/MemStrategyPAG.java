@@ -341,55 +341,9 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 	 * 
 	 * @throws SoSimException	all process' pages can not be allocated
 	 */
-	public void allocateProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException {
-/*
-		Object[] memOrdered = memory.toArray();
-		int OSSize = memory.get(0).getAllocated().getParent().getNumBlocks();	
-    	Arrays.sort(memOrdered);
-    	ProcessComplete parent = allocate.getParent();
-    	System.out.println("quantum blocks size"+parent.getQuantumBlocks().size());
-    	ProcessMemUnit child;
-    	List<MemPartition> candidates = new LinkedList<MemPartition>();
-    	int swapTimes = 0;
-    	int left = parent.getCursor(), right = parent.getUpdatedCursor();
-    	
-    	// Checking memory frames
-    	for (int j = left; j < right; j++) {
-    		child = parent.getBlock(j);
-    		if (((ProcessComponent) child).isLoad()) { // Shoul be allocated
-        		int i = 0;	
-        		MemPartition candidate = null;
-        		while (i<memOrdered.length && candidate == null) {
-            		MemPartition partition = (MemPartition) memOrdered[i];
-            		if (!candidates.contains(partition) && partition.getAllocated() == null) {
-            			candidate = partition;// First candidate
-            		}
-            		i++;
-        		}
-        		if (candidate != null) candidates.add(candidate);
-        		//else throw new SoSimException("me_08");   
-        		else {
-        			int position = OSSize + swapTimes;//int position = LRUGetPosition();
-        			this.swapOutProcess(memory, swap,(MemPartition) memOrdered[position]);	
-					candidate = (MemPartition) memOrdered[position];
-					candidates.add(candidate);
-					swapTimes++;
-					//System.out.println("There it is!!!!");
-					//throw new SoSimException("me_08");
-				}
-    		} 
-    	}
-    	
-    	// Allocate pages
-    	for (int j = left; j < right; j++) {
-    		child = parent.getBlock(j);
-    		if (((ProcessComponent) child).isLoad()) { // Shoul be allocated
-    			MemPartition block = candidates.remove(0);
-    			block.setAllocated(child); 
-    		} else swap.add(child); // Not loaded
-    	}
-    	*/
-	}
+	public void allocateProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) 
+			throws SoSimException {
+		}
 	/*
 	public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, 
 			ProcessMemUnit allocate, int memory_size) throws SoSimException {
