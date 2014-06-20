@@ -70,7 +70,7 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		this.quantumOrders = "";
 
 	}
-	
+
 	public ProcessComplete(int pid, String name, int size, int duration,
 			Color color, int quantum, String list) {
 		this.pid = pid;
