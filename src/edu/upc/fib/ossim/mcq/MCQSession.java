@@ -64,7 +64,7 @@ public class MCQSession {
 		instance = null;
 	}
 	public MCQChooserDialog getMCQChooserDialog(){
-		if(chooser == null)chooser = new MCQChooserDialog();
+		if(chooser == null) chooser = new MCQChooserDialog();
 		return chooser;
 	}
 	public void addAnswer(int nbr, String Answer){
@@ -82,7 +82,7 @@ public class MCQSession {
 		while(answers.get(it)!=null){
 			answer = new Element("question");
 			answer.setAttribute("id",""+it);
-			answer.addContent(new Element("answer",answers.get(it)));
+			answer.addContent(new Element("answer").setText(answers.get(it)));
 			doc.getRootElement().addContent(answer);
 			it++;
 		}
@@ -99,6 +99,9 @@ public class MCQSession {
 		System.out.println("File Saved!");
 		
 		
+	}
+	public void destroyMCQChooserDialog(){
+		chooser = null;
 	}
 	
 }

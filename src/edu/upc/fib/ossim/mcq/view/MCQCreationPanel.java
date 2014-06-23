@@ -238,7 +238,7 @@ public class MCQCreationPanel extends JPanel{
 		param.add(attribute);
 		attribute = new Vector<String>();
 		attribute.add("text");
-		attribute.add(question.getText());
+		attribute.add(question.getText().replace("\n", "&#10;"));
 		param.add(attribute);
 
 
@@ -320,18 +320,16 @@ public class MCQCreationPanel extends JPanel{
 		nbrAnswers = Answers.size();
 		this.answerType = answerType;
 		if(answerType!=3){
+			answerGroup.clear();
+			radioGroup.clear();
 		for(int it = 0; it < Answers.size() ; it++){
-			if(it>=answerGroup.size())
-				answerGroup.add(new JTextArea(5,20));
+			answerGroup.add(new JTextArea(5,20));
 			answerGroup.get(it).setText(Answers.get(it));
-			if(answerType!=3){
-				if(includeAnswers){
-					if(it>=radioGroup.size())
-						radioGroup.add(new JCheckBox());
-					radioGroup.get(it).setSelected(answers.get(it));
+			radioGroup.add(new JCheckBox());
+			if(includeAnswers){
+				radioGroup.get(it).setSelected(answers.get(it));
 				}
 			}
-		}
 		}
 		else{
 			nbrAnswers = 1;

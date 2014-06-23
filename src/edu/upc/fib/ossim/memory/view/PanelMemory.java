@@ -33,6 +33,9 @@ import edu.upc.fib.ossim.template.view.PanelTemplate;
  * @see SwapPainter
  */
 public class PanelMemory extends PanelTemplate { 
+	
+	protected JScrollPane scroll2;
+	
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -85,9 +88,10 @@ public class PanelMemory extends PanelTemplate {
 		pane.add(scroll1);
 
 		SwapPainter swap = (SwapPainter) presenter.getPainter(MemoryPresenter.SWAP_PAINTER);
-		JScrollPane scroll2 = new JScrollPane(swap);
+		scroll2 = new JScrollPane(swap);
 		scroll2.setPreferredSize(new Dimension(MemoryPresenter.PROGRAMS_WIDTH+10, MemoryPresenter.PROGRAMS_HEIGHT+10));
 		layout.putConstraint(SpringLayout.WEST, scroll2, 0, SpringLayout.WEST, scroll1);
+		layout.putConstraint(SpringLayout.EAST, scroll2, 0, SpringLayout.EAST, scroll1);
 		layout.putConstraint(SpringLayout.NORTH,scroll2, 10, SpringLayout.SOUTH, scroll1);
 		//layout.putConstraint(SpringLayout.EAST,scroll2, -10, SpringLayout.EAST, pane);
 		pane.add(scroll2);

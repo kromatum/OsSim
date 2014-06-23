@@ -499,6 +499,7 @@ public class Menu extends JMenuBar implements ActionListener, Observer {
 				
 				break;	
 			case 56 :
+				MCQSession.getInstance().destroyMCQChooserDialog();
 				MCQSession.getInstance().getMCQChooserDialog().setVisible(true);
 				break;
 				

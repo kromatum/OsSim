@@ -34,10 +34,16 @@ public class MCQChooserDialog extends EscapeDialog implements HyperlinkListener{
 	private String name = null;
 	private JEditorPane editorPane = null;
 	private JScrollPane editorScrollPane = null;
-	private static String LINK = "file:C:\\Users\\pc distributor\\Desktop\\test.html";
+	private static URL LINK = Functions.getInstance().getResourceURL("mcq.html");
 	private int questionNumber = 1;
 	private int maxQuestions =  0;
 	private Vector<String> paths  = new Vector<String>();
+	
+	@Override
+	public void setVisible(boolean arg0){
+		super.setVisible(arg0);
+		editorPane.revalidate();
+	}
 
 	public MCQChooserDialog() {
 		this.setTitle("Available MCQs ");
@@ -47,6 +53,7 @@ public class MCQChooserDialog extends EscapeDialog implements HyperlinkListener{
 		editorScrollPane = new JScrollPane(editorPane);
 		this.add(editorScrollPane);
 		try{
+			System.out.println(LINK);
 			editorPane.setPage(LINK);
 		}catch (IOException e) {
 			e.printStackTrace();

@@ -2,7 +2,6 @@ package edu.upc.fib.ossim.memory.model;
 
 import java.awt.Color;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -390,6 +389,7 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     	}
     	*/
 	}
+	/*
 	public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, 
 			ProcessMemUnit allocate, int memory_size) throws SoSimException {
 		Object[] memOrdered = memory.toArray();
@@ -439,7 +439,52 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     	}
     	
 	}
-	
+	*/
+	public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, 
+			ProcessMemUnit allocate, int memory_size) throws SoSimException {
+		Object[] memOrdered = memory.toArray();
+		int OSSize = memory.get(0).getAllocated().getParent().getNumBlocks();	
+    	Arrays.sort(memOrdered);
+    	ProcessComplete parent = allocate.getParent();
+    	Map<Integer, List<ProcessComponent>>quantumBlocks = parent.getQuantumBlocks();
+    	int key = parent.getUpdatedKey();
+    	List<ProcessComponent> values = quantumBlocks.get(key);
+    	ProcessMemUnit child;
+    	List<MemPartition> candidates = new LinkedList<MemPartition>();
+    	// Checking memory frames
+    	for (int j = 0; j < values.size(); j++) {
+    		child = values.get(j);
+    		((ProcessComponent) child).setTime(0);
+    		addOtherTime(memory,child);
+    		boolean inMemory = isInMemory(memory,child);
+    		if(inMemory==false&&swap.contains(child)) this.swapInProcessComponent(memory, swap, child, memory_size);
+    		else{
+    		if (((ProcessComponent) child).isLoad()&&inMemory==false) { // Should be allocated   			
+        		int i = 0;	
+        		MemPartition candidate = null;
+        		while (i<memOrdered.length && candidate == null) {
+            		MemPartition partition = (MemPartition) memOrdered[i];
+            		if (!candidates.contains(partition) && partition.getAllocated() == null) {
+            			candidate = partition;// First candidate
+            		}
+            		i++;
+        		}
+        		if (candidate != null) candidates.add(candidate);
+        		//else throw new SoSimException("me_08");   
+        		else {
+        			int position = LRUFindPosition(memory,OSSize);//int position = LRUGetPosition();
+        			this.swapOutProcess(memory, swap,(MemPartition) memOrdered[position]);	
+					candidate = (MemPartition) memOrdered[position];
+					candidates.add(candidate);
+				}
+        		candidate.setAllocated(child);
+    		} 
+    		
+    	}
+    	}
+    	
+    	
+	}
 	
 	private int LRUFindPosition(List<MemPartition> memory,int OSSize) {
 		int max = 0;

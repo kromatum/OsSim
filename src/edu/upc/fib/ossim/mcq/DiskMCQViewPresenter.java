@@ -7,6 +7,7 @@ import java.util.Vector;
 import edu.upc.fib.ossim.AppSession;
 import edu.upc.fib.ossim.disk.DiskPresenter;
 import edu.upc.fib.ossim.mcq.view.PanelMCQViewDisk;
+import edu.upc.fib.ossim.mcq.view.PanelMCQViewFileSystem;
 import edu.upc.fib.ossim.template.view.PanelTemplate;
 import edu.upc.fib.ossim.utils.Functions;
 import edu.upc.fib.ossim.utils.SoSimException;
@@ -59,13 +60,21 @@ public class DiskMCQViewPresenter extends DiskPresenter{
 		else{
 			int blockOnStep = new Integer (data.get(0).get(3).get(1)).intValue();
 			int nbrAnswers = new Integer(data.get(0).get(4).get(1)).intValue();
+			boolean includeAnswers =  data.get(0).get(5).get(1).equals("true");
 			ArrayList<String> answers = new ArrayList<String>();
+			String correct_answers = "";
 			for(int it = 1; it <= nbrAnswers; it++){
-				System.out.println("Answer:" + data.get(it).get(1).get(1));	
 				answers.add(data.get(it).get(1).get(1));
+				if(includeAnswers){
+					correct_answers+=data.get(it).get(2).get(1);
+					if(it!=nbrAnswers)
+						correct_answers+=",";
+				}
 			}
+			if(!includeAnswers)
+				correct_answers = null;
 			//MCQSession.getInstance().getmcqViewPanel(data.get(0).get(1).get(1), Integer.parseInt(data.get(0).get(2).get(1)), nbrAnswers, answers);
-			((PanelMCQViewDisk)panel).addmcqViewPanel(MCQSession.getInstance().getmcqViewPanel(MCQSession.getInstance().getMCQChooserDialog().getQuestionNumber(), data.get(0).get(1).get(1), Integer.parseInt(data.get(0).get(2).get(1)), nbrAnswers, answers,blockOnStep, null));
+			((PanelMCQViewDisk)panel).addmcqViewPanel(MCQSession.getInstance().getmcqViewPanel(MCQSession.getInstance().getMCQChooserDialog().getQuestionNumber(),data.get(0).get(1).get(1), Integer.parseInt(data.get(0).get(2).get(1)), nbrAnswers, answers,blockOnStep,correct_answers));
 			panel.disableRunning(true);
 		}
 	}

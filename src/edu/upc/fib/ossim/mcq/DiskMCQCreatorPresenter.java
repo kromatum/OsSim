@@ -75,7 +75,12 @@ public class DiskMCQCreatorPresenter extends DiskPresenter{
 					}
 				}
 				else{
+					try{
 					answers.add(data.get(it).get(2).get(1));
+					}catch(Exception exc){
+						answers.add("");
+					}
+					
 				}
 			}	
 			MCQSession.getInstance().getmcqCreationPanel().fillData(question,answerType, answers, answerbool,includeAnswers, blockOnAnswer,difficulty);

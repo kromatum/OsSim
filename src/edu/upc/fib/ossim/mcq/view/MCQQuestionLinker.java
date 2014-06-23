@@ -70,8 +70,15 @@ public class MCQQuestionLinker extends EscapeDialog{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
 	private String PATH = "C:\\Users\\pc distributor\\Desktop\\WareHouse";
-	private JLabel LPATH = new JLabel("Path: "+PATH);
+	private JLabel LEPATH = new JLabel("Path: "+PATH);
+	
+	private String FILEPATH= "";
+	private JLabel LMCQPATH = new JLabel("Path: "+ FILEPATH);
+	
+	
+	
 	private JFileChooser chooser = null;
 	
 	private String[] columnNames = {"Question",
@@ -91,6 +98,7 @@ public class MCQQuestionLinker extends EscapeDialog{
 	private JButton add = null;
 	private JButton remove = null;
 	private JButton browse = null;
+	private JButton mcqbrowse = null;
 	private static MCQQuestionLinker instance = null;
 	private Hashtable<String,URL> mcqHashTable = new Hashtable<String,URL>();
 	private Hashtable<String,URL> existingHashTable = new Hashtable<String,URL>();
@@ -128,10 +136,15 @@ public class MCQQuestionLinker extends EscapeDialog{
 			if(returnVal == JFileChooser.APPROVE_OPTION) {
 				myFile = chooser.getSelectedFile();
 				PATH = myFile.getPath();
-				LPATH.setText("Path: "+PATH);
+				LEPATH.setText("Path: "+PATH);
 				System.out.println(PATH);
 				existingTableModel.getDataVector().clear();
-				fillModel();
+				try {
+					fillModel();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				revalidate();
 			}
 		}
@@ -211,7 +224,12 @@ public class MCQQuestionLinker extends EscapeDialog{
 		super();
 		setTitle("MCQ Creator Tool");
 		
-		fillModel();
+		try {
+			fillModel();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		
 		existingTable =  new JTable(existingTableModel);
@@ -297,7 +315,7 @@ public class MCQQuestionLinker extends EscapeDialog{
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.LINE_AXIS));
 		JPanel pathPanel = new JPanel (new FlowLayout(FlowLayout.LEFT));
-		pathPanel.add(LPATH);
+		pathPanel.add(LEPATH);
 		
 		browse = new JButton("Browse Directory");
 		browse.addActionListener(new ChangeDirectoryListener());
@@ -357,6 +375,7 @@ public class MCQQuestionLinker extends EscapeDialog{
 			// TODO Auto-generated method stub
 			isEditing = true;
 			try {
+				setVisible(false);
 				edited = hash.get(table.getModel().getValueAt(table.getSelectedRow(), 0));
 				Functions.getInstance().openSimulation(edited);
 				AppSession.getInstance().getMenu().allowSaving();
@@ -377,7 +396,7 @@ public class MCQQuestionLinker extends EscapeDialog{
 	}
 	
 	
-	private void fillModel(){
+	private void fillModel()throws Exception{
 		File dir = new File(PATH);
 		existingTableModel.getDataVector().clear();
 		// list out all the file name and filter by the extension
@@ -415,9 +434,10 @@ public class MCQQuestionLinker extends EscapeDialog{
 				}
 				if(question !=null){
 					Object[] o = {question,difficulty};
-					existingTableModel.addRow(o);
-						
-					existingHashTable.put(question, list[it].toURI().toURL());
+					if(!mcqHashTable.contains(list[it].toURI().toURL())){
+						existingTableModel.addRow(o);		
+						existingHashTable.put(question, list[it].toURI().toURL());
+					}
 				}
 			} catch (MalformedURLException | SoSimException e) {
 				// TODO Auto-generated catch block
@@ -469,11 +489,56 @@ public class MCQQuestionLinker extends EscapeDialog{
 	public static void doneEditing(){
 		if(instance!=null){
 			isEditing = false;
+			try {
+				instance.fillModel();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			instance.fillMCQ();
 			instance.setVisible(true);
 		}
 	}
-	
-	
-	
 
+	private void fillMCQ() {
+		// TODO Auto-generated method stub
+		mcqTableModel.getDataVector().clear();
+		Enumeration<URL> enumeration = mcqHashTable.elements();
+		while(enumeration.hasMoreElements()){
+			URL url = enumeration.nextElement();
+			 try {
+					XMLParserJDOM parser = new XMLParserJDOM(url);
+					String sroot = parser.getRoot();
+					String question = null;
+					String difficulty = "";
+					if (sroot.equals(Functions.getInstance().getPropertyString("xml_root_mcq_pro"))){
+						question = parser.getElements("mcq").get(0).get(1).get(1);
+						difficulty = parser.getElements("mcq").get(0).get(6).get(1);
+					}
+					if(sroot.equals(Functions.getInstance().getPropertyString("xml_root_mcq_dsk"))){
+						question = parser.getElements("mcq").get(0).get(1).get(1);
+						difficulty = parser.getElements("mcq").get(0).get(6).get(1);
+					}
+					if(sroot.equals(Functions.getInstance().getPropertyString("xml_root_mcq_mem"))){
+						question = parser.getElements("mcq").get(0).get(1).get(1);
+						difficulty = parser.getElements("mcq").get(0).get(6).get(1);
+					}
+					if(sroot.equals(Functions.getInstance().getPropertyString("xml_root_mcq_fs"))){
+						question = parser.getElements("mcq").get(0).get(1).get(1);
+						difficulty = parser.getElements("mcq").get(0).get(6).get(1);
+					}
+					if(question !=null){
+						Object[] o = {question,difficulty};
+						mcqTableModel.addRow(o);
+					}
+				} catch (SoSimException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			mcqTableModel.fireTableDataChanged();
+		
+		}
 }
+
+
