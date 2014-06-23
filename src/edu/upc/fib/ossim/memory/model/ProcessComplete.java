@@ -70,24 +70,7 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		this.quantumOrders = "";
 
 	}
-
-	public ProcessComplete(int pid, String name, int size, int duration,
-			Color color, int quantum, String list) {
-		this.pid = pid;
-		this.name = name;
-		this.size = size;
-		this.duration = duration;
-		this.color = color;
-		this.blocks = new LinkedList<ProcessComponent>();
-		if (pid == 0)
-			maxpid = 1; // Restart pid
-		else
-			maxpid++;
-		this.quantum = quantum;
-		this.key = 0;
-		this.quantumOrders = list;
-
-	}
+	
 	/**
 	 * Gets itself. (Composite pattern)
 	 * 
@@ -154,21 +137,41 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		return color;
 	}
 
+	/**
+	 * Gets process quantum
+	 * 
+	 * @return process quantum
+	 */
 	public int getQuantum() {
 		return quantum;
 	}
-
+	/**
+	 * Sets process quantum
+	 * 
+	 * @param quantum
+	 *            process quantum
+	 */
 	public void setQuantum(int quantum) {
 		this.quantum = quantum;
 	}
-
+	
+	/**
+	 * Gets process quantum id
+	 * 
+	 * @return process quantum id
+	 */
 	public int getUpdatedKey() {
 		if (key < quantum) {
 			key++;
 		}
 		return key - 1;
 	}
-
+	
+	/**
+	 * Gets the state of loading process
+	 * 
+	 * @return if all the quantums of a process have been loaded
+	 */
 	public boolean isDone() {
 		return key == quantum;
 	}
@@ -205,6 +208,13 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		return blocks.size();
 	}
 
+	/**
+	 * Transforms the page orders into component blocks,
+	 * key represents the quantum id
+	 * value represents the pages used of each quantum 
+	 * 
+	 * @return new form of blocks
+	 */
 	@SuppressWarnings("unchecked")
 	public Map<Integer, List<ProcessComponent>> getQuantumBlocks()
 			throws SoSimException {
@@ -227,6 +237,11 @@ public class ProcessComplete implements ProcessMemUnit, Cloneable {
 		return res;
 	}
 
+	/**
+	 * Gets the pages orders
+	 * 
+	 * @return the pageOrders
+	 */
 	public void setQuantumOrders(String quantumOrders) {
 		this.quantumOrders = quantumOrders;
 	}

@@ -77,12 +77,22 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 	
 		
 	}
+	/**
+	 * Initializes virtual memory dividing it into frames, its size is determined by page size. 
+	 * Creates operating system pages and allocate them.   
+	 * 
+	 * @param virtual memory		partitions linked list (virtual memory)  
+	 * @param strSO			operating system process name
+	 * @param size			operating system size	
+	 * @param color			operating system background color
+	 * @param memory_size	memory size
+	 */
 	public void initVirtualMemory(List<MemPartition> virtualmemory, String strSO, int size,  Color color, int memory_size) {
 		
 		virtualmemory.clear();
 		// Create a memory frames, size = page size
 		int end = 0;
-		while (end <  5*memory_size) {
+		while (end <  5*memory_size) { //size = 5*size of physical memory
 			MemPartition b = new MemPartition(end, pageSize);
 			virtualmemory.add(b);
 			end += pageSize;
@@ -344,57 +354,15 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 	public void allocateProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) 
 			throws SoSimException {
 		}
-	/*
-	public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, 
-			ProcessMemUnit allocate, int memory_size) throws SoSimException {
-		Object[] memOrdered = memory.toArray();
-		int OSSize = memory.get(0).getAllocated().getParent().getNumBlocks();	
-    	Arrays.sort(memOrdered);
-    	ProcessComplete parent = allocate.getParent();
-    	Map<Integer, List<ProcessComponent>>quantumBlocks = parent.getQuantumBlocks();
-    	int key = parent.getUpdatedKey();
-    	List<ProcessComponent> values = quantumBlocks.get(key);
-    	ProcessMemUnit child;
-    	List<MemPartition> candidates = new LinkedList<MemPartition>();
-    	// Checking memory frames
-    	for (int j = 0; j < values.size(); j++) {
-    		child = values.get(j);
-    		((ProcessComponent) child).setTime(0);
-    		addOtherTime(memory,child);
-    		if(swap.contains(child)) this.swapInProcessComponent(memory, swap, child, memory_size);
-    		else{
-    		if (((ProcessComponent) child).isLoad()&&!isInMemory(memory,child)) { // Should be allocated   			
-        		int i = 0;	
-        		MemPartition candidate = null;
-        		while (i<memOrdered.length && candidate == null) {
-            		MemPartition partition = (MemPartition) memOrdered[i];
-            		if (!candidates.contains(partition) && partition.getAllocated() == null) {
-            			candidate = partition;// First candidate
-            		}
-            		i++;
-        		}
-        		if (candidate != null) candidates.add(candidate);
-        		//else throw new SoSimException("me_08");   
-        		else {
-        			int position = LRUFindPosition(memory,OSSize);//int position = LRUGetPosition();
-        			this.swapOutProcess(memory, swap,(MemPartition) memOrdered[position]);	
-					candidate = (MemPartition) memOrdered[position];
-					candidates.add(candidate);
-				}
-    		} 
-    	}
-    	}
-    	// Allocate pages
-    	for (int j = 0; j < values.size(); j++) {
-    		child = values.get(j);
-    		if (((ProcessComponent) child).isLoad()&&!isInMemory(memory,child)) {
-    			MemPartition block = candidates.remove(0);
-    			block.setAllocated(child); 
-    		} else swap.add(child); // Not loaded
-    	}
-    	
-	}
-	*/
+	/**
+	 * Allocates a process into memory, in pagination, instead of loading all the pages of a process at a time, 
+	 * load the process according to its page orders
+	 * 
+	 * @param memory		partitions linked list (memory)  
+	 * @param swap			processes into backing store linked list (swap)  
+	 * @param allocate		process to allocate
+	 * @param memory_size	memory size
+	 */
 	public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, 
 			ProcessMemUnit allocate, int memory_size) throws SoSimException {
 		Object[] memOrdered = memory.toArray();
@@ -441,6 +409,12 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
     	
 	}
 	
+	/**
+	 * The LRU algorithm to find the position to be replaced
+	 * 
+	 * @param memory		partitions linked list (memory)  
+	 * @param OSSize	OS size
+	 */
 	private int LRUFindPosition(List<MemPartition> memory,int OSSize) {
 		int max = 0;
 		int position = OSSize;
@@ -453,7 +427,12 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 		}
 		return position;
 	}
-
+	/**
+	 * add one time for all the pages in the physical memory except for the page being used
+	 * 
+	 * @param memory		partitions linked list (memory)  
+	 * @param child
+	 */
 	private void addOtherTime(List<MemPartition> memory, ProcessMemUnit child) {
 		Iterator<MemPartition> it = memory.iterator();
 		while(it.hasNext()){
@@ -462,7 +441,12 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 			if(p!=null&&!p.equals(child)) p.addTime();
 		}
 	}
-
+	/**
+	 * check if the child being used is in memory or not
+	 * 
+	 * @param memory		partitions linked list (memory)  
+	 * @param child
+	 */
 	private boolean isInMemory(List<MemPartition> memory, ProcessMemUnit child) {
 		Iterator<MemPartition> it = memory.iterator();
 		while(it.hasNext()){
@@ -621,16 +605,22 @@ public class MemStrategyPAG extends MemStrategyAdapterNOCONT {
 		else return ""; // never
 	}
 	
-	public Object getQuantumListData(ProcessMemUnit process) {
-		Object data = new Object();
-		String s = process.getParent().getQuantumOrders();
-		data = s;
-		return data;
-	}
+	/**
+	 * Adds pages orders to a process.  (Only in pagination)  
+	 * 
+	 * @param p		process
+	 * @param d		page orders data 
+	 */
 	public void addQuantumListData(ProcessComplete p,  Object d) {
 		String data = (String)d;
 		p.setQuantumOrders(data);
 	}
+	/**
+	 * Adds quantum numbers to a process.  (Only in pagination)  
+	 * 
+	 * @param p		process
+	 * @param d		page orders data 
+	 */
 	public void addQuantum(ProcessComplete p,  Object d){
 		Integer i = (Integer)d;
 		p.setQuantum(i.intValue());

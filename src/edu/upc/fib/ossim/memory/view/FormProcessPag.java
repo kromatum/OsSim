@@ -111,7 +111,14 @@ public class FormProcessPag extends FormProcess {
 
 		pn.add(scroll);
 	}
-
+	/**
+	 * Creates and initialize pages' orders, 
+	 * with ";' distinguishes every quantum and "," distinguishes every page
+	 * 
+	 * @param values
+	 *            value with index 6 contains pages orders data
+	 *            <code>Vector<Vector<Object>></code>
+	 */
 	public void initPageOrder(Vector<Object> values) {
 
 		JPanel pageOrder = new JPanel();
@@ -128,12 +135,19 @@ public class FormProcessPag extends FormProcess {
 		pn.add(pageOrder);
 	}
 
+	/**
+	 * Creates and initialize number of quantums, maximum value 10
+	 * 
+	 * @param values
+	 *            value with index 7 contains pages orders data
+	 *            <code>Vector<Vector<Object>></code>
+	 */
 	public void initQuantum(Vector<Object> values) {
 		grid.add(new JLabel("quantum"));
 		SpinnerModel spmodel;
 		if (values.size() > 1)
 			spmodel = new SpinnerNumberModel(new Integer(values.get(7)
-					.toString()).intValue(), 1, 4, 1);
+					.toString()).intValue(), 1, 10, 1);
 		else
 			spmodel = new SpinnerNumberModel(3, 1, 10, 1);
 		quantum = new JSpinner(spmodel);
@@ -173,14 +187,18 @@ public class FormProcessPag extends FormProcess {
 	}
 
 	/**
-	 * No concrete block validation is needed
+	 * No concrete block validation is needed 
 	 * 
 	 * @return true
 	 */
 	public boolean validateFieldsBlock() {
 		return validateFieldsOrder();
 	}
-
+	
+	/**
+	 * Needs input fields validation for quantum and pages' orders
+	 * 
+	 */
 	public boolean validateFieldsOrder() {
 		String orders = textField.getText();
 		if ("".equals(orders) || orders == null) {
@@ -221,7 +239,6 @@ public class FormProcessPag extends FormProcess {
 				}
 			}
 		}
-
 		return true;
 
 	}
@@ -244,10 +261,15 @@ public class FormProcessPag extends FormProcess {
 		return tablemodel.getDataVector();
 	}
 
+	/**
+	 * Returns a string containing pages orders
+	 */
 	public Object getOrderListData() {
 		return textField.getText();
 	}
-
+	/**
+	 * Returns the quantum number
+	 */
 	public Object getQuantumData() {
 		return quantum.getValue();
 	}

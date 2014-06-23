@@ -73,8 +73,6 @@ public interface MemStrategy {
 	 * @return	data from a process' components
 	 */
 	public Vector<Vector<Object>> getProcessComponentsData(ProcessMemUnit process);
-
-	public Object getQuantumListData(ProcessMemUnit process);
 	
 	/**
 	 * Returns memory occupation table header 
@@ -130,8 +128,20 @@ public interface MemStrategy {
 	 * @param d		components data 
 	 */
 	public void addProcessComponents(ProcessComplete p,  Vector<Vector<Object>> d);
-	//public void addProcessPageOrders(ProcessComplete p,  Object d);
+	/**
+	 * Adds pages orders to a process.  (Only in pagination)  
+	 * 
+	 * @param p		process
+	 * @param d		page orders data 
+	 */
 	public void addQuantumListData(ProcessComplete p,  Object d);
+	
+	/**
+	 * Adds quantum numbers to a process.  (Only in pagination)  
+	 * 
+	 * @param p		process
+	 * @param d		page orders data 
+	 */
 	public void addQuantum(ProcessComplete p,  Object d);
 	
 	/**
@@ -172,6 +182,16 @@ public interface MemStrategy {
 	 * @throws SoSimException	process can not be allocated
 	 */
 	public void allocateProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException;
+	
+	/**
+	 * Allocates a process into memory, in pagination, instead of loading all the pages of a process at a time, 
+	 * load the process according to its page orders
+	 * 
+	 * @param memory		partitions linked list (memory)  
+	 * @param swap			processes into backing store linked list (swap)  
+	 * @param allocate		process to allocate
+	 * @param memory_size	memory size
+	 */
 	public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException;
 	/**
      * Allocates swapped process from backing store into memory. 
@@ -227,10 +247,25 @@ public interface MemStrategy {
 	 * @return	initial memory xml information
 	 */
 	public  Vector<Vector<Vector<String>>> getXMLDataMemory(List<MemPartition> memory);
-
+	/**
+	 * Initializes virtual memory and allocates operating system 
+	 * 
+	 * @param virtualmemory		partitions linked list (virtualmemory)  
+	 * @param strSO			operating system process name
+	 * @param size			operating system size	
+	 * @param color			operating system background color
+	 * @param memory_size	memory size
+	 */
 	public void initVirtualMemory(List<MemPartition> virtualmemory, String label,
 			int osSize, Color lightgray, int memorySize);
-
+	/**
+	 * Allocates a process into virtual memory, in pagination, loading all the pages of a process at one time
+	 * 
+	 * @param memory		partitions linked list (memory)  
+	 * @param swap			processes into backing store linked list (swap)  
+	 * @param allocate		process to allocate
+	 * @param memory_size	memory size
+	 */
 	public void allocateVirtualProcess(List<MemPartition> virtualmemory,
-			List<ProcessMemUnit> swap, ProcessMemUnit processMemUnit, int i);
+			List<ProcessMemUnit> swap, ProcessMemUnit processMemUnit, int memory_size);
 }

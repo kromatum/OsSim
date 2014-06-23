@@ -903,7 +903,9 @@ public class MemoryPresenter extends Presenter {
 	public int getMemProcessSize(int start) {
 		return context.getMemProcessSize(start);
 	}
-
+	/**
+	 * @see ContextMemory#getVirtualMemProcessSize(int)
+	 */
 	public int getVirtualMemProcessSize(int start) {
 		return context.getVirtualMemProcessSize(start);
 	}
@@ -914,7 +916,9 @@ public class MemoryPresenter extends Presenter {
 	public Color getMemProcessColor(int start) {
 		return context.getMemProcessColor(start);
 	}
-
+	/**
+	 * @see ContextMemory#getVirtualMemProcessColor(int)
+	 */
 	public Color getVirtualMemProcessColor(int start) {
 		return context.getVirtualMemProcessColor(start);
 	}
@@ -963,7 +967,9 @@ public class MemoryPresenter extends Presenter {
 	public int getMemorySize() {
 		return context.getMemorySize();
 	}
-
+	/**
+	 * @see ContextMemory#getVirtualMemorySize()
+	 */
 	public int getVirtualMemorySize() {
 		return context.getVirtualMemorySize();
 	}

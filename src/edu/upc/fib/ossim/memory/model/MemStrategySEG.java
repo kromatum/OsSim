@@ -262,12 +262,21 @@ public class MemStrategySEG extends MemStrategyAdapterNOCONT {
 		}
 	}
 	
-	public Object getQuantumListData(ProcessMemUnit process){
-		return null;
-	}
+	/**
+	 * Adds pages orders to a process.  (Only in pagination)  
+	 * 
+	 * @param p		process
+	 * @param d		page orders data 
+	 */
 	public void addQuantumListData(ProcessComplete p,  Object d) {
 		//Do nothing
 	}
+	/**
+	 * Adds quantum numbers to a process.  (Only in pagination)  
+	 * 
+	 * @param p		process
+	 * @param d		page orders data 
+	 */
 	public void addQuantum(ProcessComplete p,  Object d){
 		//Do nothing
 	}

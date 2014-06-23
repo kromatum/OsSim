@@ -20,7 +20,7 @@ import edu.upc.fib.ossim.template.view.PanelTemplate;
 /**
  * Main memory management panel. Tool bar allows process creation, memory settings managing, 
  * information view and time control apart from common actions such as: loading and saving simulations. <br/>
- * This panel contains 3 elements (painters), a physical memory scheme, a process queue and a 
+ * This panel contains 4 elements (painters), a physical memory scheme, a virtual memory scheme, a process queue and a 
  * a backing store where reside swapped processes. a secondary one with incoming processes and the cpu. 
  * In addition a legend shows fragmentation textures to identify them into memory      
  *  

@@ -126,10 +126,7 @@ public abstract class MemStrategyAdapterCONT implements MemStrategy {
 	public Vector<Vector<Object>> getProcessComponentsData(ProcessMemUnit process) {
 		return null;
 	}
-	public Object getQuantumListData(ProcessMemUnit process){
-		return null;
-	}
-	
+
 	/**
 	 * Returns memory occupation table header: address, partition size, pid, name, process size, duration  
 	 * 
@@ -217,10 +214,21 @@ public abstract class MemStrategyAdapterCONT implements MemStrategy {
 	public void addProcessComponents(ProcessComplete p,  Vector<Vector<Object>> d) {
 		// Do nothing
 	}
-	
+	/**
+	 * Adds pages orders to a process.  (Only in pagination)  
+	 * 
+	 * @param p		process
+	 * @param d		page orders data 
+	 */
 	public void addQuantumListData(ProcessComplete p,  Object d) {
 		//Do nothing
 	}
+	/**
+	 * Adds quantum numbers to a process.  (Only in pagination)  
+	 * 
+	 * @param p		process
+	 * @param d		page orders data 
+	 */
 	public void addQuantum(ProcessComplete p,  Object d){
 		//Do nothing
 	}
@@ -293,9 +301,26 @@ public abstract class MemStrategyAdapterCONT implements MemStrategy {
 		if (candidate != null) allocateCandidate(memory, candidate, allocate);
 		else throw new SoSimException("me_08");
 	}
+	
+	/**
+	 * Allocates a process into virtual memory, in pagination, loading all the pages of a process at one time
+	 * 
+	 * @param memory		partitions linked list (memory)  
+	 * @param swap			processes into backing store linked list (swap)  
+	 * @param allocate		process to allocate
+	 * @param memory_size	memory size
+	 */
 	public void allocateVirtualProcess(List<MemPartition> virtualmemory,
 			List<ProcessMemUnit> swap, ProcessMemUnit processMemUnit, int i){};
-	
+			/**
+			 * Allocates a process into memory, in pagination, instead of loading all the pages of a process at a time, 
+			 * load the process according to its page orders
+			 * 
+			 * @param memory		partitions linked list (memory)  
+			 * @param swap			processes into backing store linked list (swap)  
+			 * @param allocate		process to allocate
+			 * @param memory_size	memory size
+			 */
 	public void allocateQuantumProcess(List<MemPartition> memory, List<ProcessMemUnit> swap, ProcessMemUnit allocate, int memory_size) throws SoSimException {}
 	protected abstract void allocateCandidate(List<MemPartition> memory, MemPartition candidate, ProcessMemUnit allocate);
 	

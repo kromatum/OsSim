@@ -468,6 +468,13 @@ public class ContextMemory {
 	public int getMemSize(int start) {
 		return getByStart(start).getSize();
 	}
+	
+	/**
+	 * Gets virtual memory partition size
+	 * 
+	 * @param start	virtual memory partition start address
+	 * @return	virtual memory partition size
+	 */
 	public int getVirtualMemSize(int start) {
 		return getByVirtualStart(start).getSize();
 	}
@@ -483,6 +490,14 @@ public class ContextMemory {
 		if (getByStart(start).getAllocated() != null) return getByStart(start).getAllocated().getSize();
 		else return -1;
 	}
+	
+	/**
+	 * Gets process size allocated at partition identified by start or -1 
+	 * if no process is allocated
+	 * 
+	 * @param start	virtual memory partition start address
+	 * @return	process size allocated at partition identified by start or -1
+	 */
 	public int getVirtualMemProcessSize(int start) {
 		if (getByVirtualStart(start).getAllocated() != null) return getByVirtualStart(start).getAllocated().getSize();
 		else return -1;
@@ -499,6 +514,14 @@ public class ContextMemory {
 		if (getByStart(start).getAllocated() != null) return getByStart(start).getAllocated().getParent().getColor();
 		else return null;
 	}
+	
+	/**
+	 * Gets process color allocated at partition identified by start or null 
+	 * if no process is allocated
+	 * 
+	 * @param start	virtual memory partition start address
+	 * @return	process color allocated at partition identified by start or null
+	 */
 	public Color getVirtualMemProcessColor(int start) {
 		if (getByVirtualStart(start).getAllocated() != null) return getByVirtualStart(start).getAllocated().getParent().getColor();
 		else return null;
@@ -531,6 +554,16 @@ public class ContextMemory {
 		}
 		else return null;
 	}
+	
+	/**
+	 * Gets process information allocated at partition identified by start or null 
+	 * if no process is allocated
+	 * 
+	 * @param start	virtual memory partition start address
+	 * @return	process information allocated at partition identified by start or null
+	 * 
+	 * @see MemStrategy#getProcessComponentInfo(ProcessMemUnit)
+	 */
 	public Vector<String> getVirtualMemProcessInfo(int start) {
 		// Painters virtual memory info
 		Vector<String> info = new Vector<String>();
@@ -625,19 +658,6 @@ public class ContextMemory {
 		if (data.size() == 0) return null;
 		return data;
 	}
-	public Vector<Vector<Object>> getVirtualTableInfoData() {
-		// General information data 
-		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
-
-		Iterator<MemPartition> it = virtualmemory.iterator();
-		while (it.hasNext()) {
-			MemPartition m = it.next();
-			data.add(algorithm.getTableBlockInfo(m));
-		}
-
-		if (data.size() == 0) return null;
-		return data;
-	}
 
 	/**
 	 * Returns memory partition information table data depending on current algorithm      
@@ -651,11 +671,7 @@ public class ContextMemory {
 		MemPartition m = getByStart(start);
 		return algorithm.getTableBlockInfo(m);
 	}
-	public Vector<Object> getVirtualMemBlockInfo(int start) {
-		// Information table data
-		MemPartition m = getByVirtualStart(start);
-		return algorithm.getTableBlockInfo(m);
-	}
+	
 	
 	/**
 	 * Returns process creation table header depending on current algorithm      
@@ -707,14 +723,9 @@ public class ContextMemory {
 		if (selectedPartition.getAllocated() == null) throw new SoSimException("me_09");
 		return algorithm.getMemProcessTableData(memory, selectedPartition.getAllocated().getParent());
 	}
-	public Vector<Vector<Object>> getVirtualMemProcessTableData() throws SoSimException {
-		// Allocation tables, segmentation table and page table 
-		if (selectedPartition.getAllocated() == null) throw new SoSimException("me_09");
-		return algorithm.getMemProcessTableData(virtualmemory, selectedPartition.getAllocated().getParent());
-	}
 	
 	/**
-	 * Adds a new process to processes queue, in pagination and segmentation 
+	 * Adds a new process to processes queue, in segmentation 
 	 * also create its components, pages or segments      
 	 *  
 	 * @param data	process data: pid, name, size, duration and color
@@ -728,6 +739,17 @@ public class ContextMemory {
     	processQueue.add(p);
     	algorithm.addProcessComponents(p, components);
     }
+	
+	/**
+	 * Adds a new process to processes queue, in pagination 
+	 * also create its components, pages    
+	 *  
+	 * @param data	process data: pid, name, size, duration and color
+	 * @param components	in pagination, pages data, in segmentation, segments data   
+	 * @param list the pages orders entered
+	 * @param the quantum numbers entered
+	 * @see MemStrategy#addProcessComponents(ProcessComplete, Vector, int)
+	 */
     public void addProgram(Vector<Object> data, Vector<Vector<Object>> components, Object list, Object quantum) {
     	// Add Program p to program's queue 
 
@@ -742,7 +764,7 @@ public class ContextMemory {
 
 
 	/**
-	 * Update a process from processes queue, in pagination and segmentation 
+	 * Update a process from processes queue, in segmentation 
 	 * also updates its components, pages or segments      
 	 *  
 	 * @param data	process data: pid, name, size, duration and color
@@ -758,7 +780,16 @@ public class ContextMemory {
     	processQueue.add(i, p);
     	algorithm.addProcessComponents(p, components);
     }
-    
+    /**
+	 * Update a process from processes queue, in pagination
+	 * also updates its components, pages or segments      
+	 *  
+	 * @param data	process data: pid, name, size, duration and color
+	 * @param components	in pagination, pages data, in segmentation, segments data   
+	 * @param list the pages orders entered
+	 * @param the quantum numbers entered
+	 * @see MemStrategy#addProcessComponents(ProcessComplete, Vector, int)
+	 */
     public void updProgram(Vector<Object> data, Vector<Vector<Object>> components,Object list, Object quantum) {
     	// Add Program p to program's queue 
     	//ArrayList<Integer> order = transformToArray(list);
@@ -926,7 +957,6 @@ public class ContextMemory {
     		if (processQueue.size() > 0 ){
     			if(!algorithm.getAlgorithmInfo().contains("Pagination")) {
     			algorithm.allocateProcess(memory, swap, processQueue.get(0), memorySize);
-    			//algorithm.allocateVirtualProcess(virtualmemory, swap, processQueue.get(0), 5*memorySize);
     			processQueue.remove(0);
     			}
     			else{

@@ -97,11 +97,24 @@ public class FormProcess extends FormTemplate {
           
         addOKButton();
 	}
-	
+	/**
+	 * only pagination process page orders
+	 * 
+	 * @param values	null
+	 * 
+	 * @see FormProcessPag
+	 */
 	public void initPageOrder(Vector<Object> values) {
-		// doNothing
-		
+		// doNothing	
 	}
+	
+	/**
+	 * only pagination process quantum
+	 * 
+	 * @param values	null
+	 * 
+	 * @see FormProcessPag
+	 */
 	public void initQuantum(Vector<Object> values) {
 		// doNothing
 		
@@ -178,9 +191,24 @@ public class FormProcess extends FormTemplate {
 	public Vector<Vector<Object>> getComponentsData() {
 		return null;
 	}
+	/**
+	 * Returns null
+	 * 
+	 * @return	nothing
+	 * 
+	 * @see FormProcessPag
+	 */
 	public Object getOrderListData() {	
 		return null;
 	}
+	
+	/**
+	 * Returns null
+	 * 
+	 * @return	nothing
+	 * 
+	 * @see FormProcessPag
+	 */
 	public Object getQuantumData(){
 		return null;
 	}

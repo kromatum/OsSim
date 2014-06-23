@@ -19,9 +19,9 @@ import edu.upc.fib.ossim.utils.Translation;
 
 
 /**
- * Paints Main Memory. Processes are load into memory or released from it, main memory painter 
- * shows memory occupation, internal and external fragmentation at a concrete simulation time .
- * A pop up menu allows remove or swap out processes and address translation  
+ * Paints Virtual Memory.Only useful for Pagination.
+ * The size of virtual memory is limitless for the processes.When we load a process, all of its pages will
+ * be loaded into virtual memory.
  * 
  * @author Alex Macia
  */
@@ -67,7 +67,6 @@ public class VirtualMemoryPainter extends PainterTemplate {
 		
 		// Draw Addresses
 		int memHeight = ((MemoryPresenter) presenter).getVirtualMemorySize();
-		//int memHeight = 100;
 		// Scroll control height
 		//if (M_UNITHEIGTH *  memHeight + 2*BORDER > h) {
 			int newHeigth = M_UNITHEIGTH *  memHeight + 2*BORDER;
@@ -89,7 +88,6 @@ public class VirtualMemoryPainter extends PainterTemplate {
 		
 		// Fill empty memory
 		Functions.getInstance().drawTexture(g2, EMPTY, ADDR_WIDTH, BORDER, w-ADDR_WIDTH-BORDER, M_UNITHEIGTH *  memHeight);  
-		//int OSSize = ((MemoryPresenter) presenter).getOSSize();
 		for (int i = 0; i < memHeight; i++) {
 			g.setColor(Color.BLACK);
 			g.drawString("@" + i, 2,  i*M_UNITHEIGTH + 12 + BORDER);
@@ -99,6 +97,7 @@ public class VirtualMemoryPainter extends PainterTemplate {
 		int start = 0, height = 0, prog_height = 0, memStart = 0;
 		map.clear();
 		
+		//The painter exists only when we choose the algorithm Pagination
 		boolean isPAG = ((MemoryPresenter) presenter).getSettings().getAlgorithm().equalsIgnoreCase("PAG");
 		while (isPAG&&it.hasNext()) {
 			start = it.next().intValue();
@@ -137,7 +136,6 @@ public class VirtualMemoryPainter extends PainterTemplate {
 		g2.setColor (Color.BLACK);
 		g2.draw(rect);
 		
-		int OSSize = ((MemoryPresenter) presenter).getOSSize();
 		// Information
 		
 		Vector<String> info = ((MemoryPresenter) presenter).getVirtualMemProgramInfo(start);
@@ -146,9 +144,7 @@ public class VirtualMemoryPainter extends PainterTemplate {
 		int xText = x + 5;
 	    int yText = y + 15;
 		
-		Iterator<String> it = info.iterator();
-		
-			
+		Iterator<String> it = info.iterator();		
 			while (it.hasNext()) {
 				String s = it.next();
 				bounds = g2.getFont().getStringBounds(s, frc);
