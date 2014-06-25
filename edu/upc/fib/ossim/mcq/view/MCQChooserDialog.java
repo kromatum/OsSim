@@ -24,6 +24,7 @@ import edu.upc.fib.ossim.AppSession;
 import edu.upc.fib.ossim.mcq.MCQSession;
 import edu.upc.fib.ossim.utils.EscapeDialog;
 import edu.upc.fib.ossim.utils.Functions;
+import edu.upc.fib.ossim.utils.HelpDialog;
 import edu.upc.fib.ossim.utils.SoSimException;
 
 public class MCQChooserDialog extends EscapeDialog implements HyperlinkListener{
@@ -34,7 +35,7 @@ public class MCQChooserDialog extends EscapeDialog implements HyperlinkListener{
 	private String name = null;
 	private JEditorPane editorPane = null;
 	private JScrollPane editorScrollPane = null;
-	private static String LINK = "file:C:\\Users\\pc distributor\\Desktop\\test.html";
+	private static URL LINK = Functions.getInstance().getResourceURL("mcq.html");
 	private int questionNumber = 1;
 	private int maxQuestions =  0;
 	private Vector<String> paths  = new Vector<String>();
@@ -88,7 +89,7 @@ public class MCQChooserDialog extends EscapeDialog implements HyperlinkListener{
 			if (name != null && !name.equals("")){
 				URL url = e.getURL();
 				
-
+				System.out.println(url);
 				if (url != null) {
 					if (url.toString().endsWith("xml")) {  // Load simulation
 						parseXML(url);
