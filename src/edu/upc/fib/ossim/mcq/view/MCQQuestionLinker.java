@@ -71,7 +71,7 @@ public class MCQQuestionLinker extends EscapeDialog{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private String PATH = "C:\\Users\\pc distributor\\Desktop\\WareHouse";
+	private String PATH = ".";
 	private JLabel LEPATH = new JLabel("Path: "+PATH);
 	
 	private String FILEPATH= "";
