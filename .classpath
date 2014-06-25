@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
@@ -5,3 +6,10 @@
 	<classpathentry kind="lib" path="C:/Users/pc distributor/Desktop/os sim/lib/jdom.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path=""/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
+>>>>>>> refs/remotes/origin/master
