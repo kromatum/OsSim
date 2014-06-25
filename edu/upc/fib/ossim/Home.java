@@ -71,11 +71,11 @@ public class Home extends JPanel implements Observer {
 		disk.setActionCommand("mngd");
 		disk.addActionListener(menu);
 		qcm_creator =  new JButton(Functions.getInstance().createImageIcon("qcm_creator.jpg"));
-		qcm_creator.setToolTipText(Translation.getInstance().getLabel("all_72"));
+		qcm_creator.setToolTipText(Translation.getInstance().getLabel("all_73"));
 		qcm_creator.setActionCommand("qcmc");
 		qcm_creator.addActionListener(menu);
 		qcm_loader =  new JButton(Functions.getInstance().createImageIcon("qcm_loader.jpg"));
-		qcm_loader.setToolTipText(Translation.getInstance().getLabel("all_73"));
+		qcm_loader.setToolTipText(Translation.getInstance().getLabel("all_74"));
 		qcm_loader.setActionCommand("qcml");
 		qcm_loader.addActionListener(menu);
 
