@@ -14,6 +14,8 @@ import edu.upc.fib.ossim.utils.Functions;
 import edu.upc.fib.ossim.utils.Translation;
 
 
+
+
 /**
  * Welcome application panel, four buttons allow access to simulations: 
  * process scheduling, memory management, file system management and disk scheduling
