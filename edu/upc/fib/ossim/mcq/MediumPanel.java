@@ -144,7 +144,6 @@ public class MediumPanel extends EscapeDialog implements ActionListener{
 
 	}
 
-	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
 		if(arg0.getSource().equals(plainText))
@@ -160,7 +159,7 @@ public class MediumPanel extends EscapeDialog implements ActionListener{
 	}
 	public int getnbrAnswers(){
 		
-		return (int)nbrAnswers.getValue();
+		return (Integer) nbrAnswers.getValue();
 	}
 	public int getAnswerType(){
 		if(uniqueChoice.isSelected())

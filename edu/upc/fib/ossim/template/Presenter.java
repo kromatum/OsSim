@@ -469,15 +469,13 @@ public abstract class Presenter implements Observer, ChangeListener, ActionListe
 					break;
 				case 13:	// Save actual simulation file  
 					if(opened!=null){
-						int dialogResult = JOptionPane.showConfirmDialog (null, "The data contained in the existing file will be overwritten, Continue??","Warning",JOptionPane.YES_NO_OPTION);
-						if(dialogResult== JOptionPane.YES_OPTION){
 						saveXML(opened.toURI().toURL());
 						if(MCQQuestionLinker.isEditing()){
 							AppSession.getInstance().getMenu().home();
 							MCQQuestionLinker.doneEditing();
 							opened = null;
 						}
-						}
+
 						break;
 					}
 				case 14: // save as

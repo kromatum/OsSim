@@ -26,8 +26,6 @@ public class PanelMCQCreatorMemory extends PanelMemory{
 		mcqCreationPanel = MCQSession.getInstance().getmcqCreationPanel();
 		layout.putConstraint(SpringLayout.EAST, mcqCreationPanel, -10, SpringLayout.EAST, pane);
 		layout.putConstraint(SpringLayout.SOUTH, mcqCreationPanel, -10, SpringLayout.SOUTH, pane);
-		layout.putConstraint(SpringLayout.WEST, mcqCreationPanel, 10, SpringLayout.EAST, scroll2);
-		
 		pane.add(mcqCreationPanel);
 	}
 }

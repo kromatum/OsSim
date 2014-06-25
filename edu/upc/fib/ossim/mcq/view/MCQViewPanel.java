@@ -1,6 +1,5 @@
 package edu.upc.fib.ossim.mcq.view;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -32,7 +31,7 @@ public class MCQViewPanel extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1L;
 
 	private int nbrQuestion = 0;
-	private JTextArea question = null;
+	private JLabel question = null;
 	private List<JCheckBox> radioGroup = null;
 	private List<JLabel> answerGroup = null;
 	private static String  lanswer = "Answers";
@@ -54,9 +53,7 @@ public class MCQViewPanel extends JPanel implements ActionListener{
 		this.nbrQuestion = MCQSession.getInstance().getMCQChooserDialog().getQuestionNumber();
 		this.correct_answer=correct_answer;
 		block_on_step = block;
-		this.question = new JTextArea(question.replace("&#10;", "\n"));
-		this.question.setEditable(false);
-		this.question.setBackground(Color.LIGHT_GRAY);
+		this.question = new JLabel(question);
 		this.answerType = answerType;
 		if(this.answerType==3){
 			this.nbrAnswers = 1;

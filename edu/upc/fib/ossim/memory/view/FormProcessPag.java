@@ -1,7 +1,6 @@
 package edu.upc.fib.ossim.memory.view;
 
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.util.Vector;
 
 import javax.swing.JLabel;
@@ -104,14 +103,12 @@ public class FormProcessPag extends FormProcess {
 
 	public void initPageOrder(Vector<Object>values) {
 		
-		JPanel pageOrder = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JPanel pageOrder = new JPanel();
 		Object data = null;
 		if (values.size() > 1) data = (Object)values.get(6);
 		else data = (String)"0,0;0,0,0;0;";
 		JLabel label = new JLabel("PageOrder");
-		textField = new JTextField(10);
-		textField.setText((String)data);
-        //textField = new JTextField((String)data);
+        textField = new JTextField((String)data);
         textField.addFocusListener(presenter);   
 		pageOrder.add(label);
 		pageOrder.add(textField);
@@ -121,7 +118,7 @@ public class FormProcessPag extends FormProcess {
 	public void initQuantum(Vector<Object> values) {
 		grid.add(new JLabel("quantum"));
 		SpinnerModel spmodel;
-		if (values.size() > 1) spmodel = new SpinnerNumberModel(new Integer(values.get(7).toString()).intValue(), 1, 10, 1);
+		if (values.size() > 1) spmodel = new SpinnerNumberModel(new Integer(values.get(7).toString()).intValue(), 1, 4, 1);
 		else spmodel = new SpinnerNumberModel(1, 1,10, 1);
 		quantum = new JSpinner(spmodel);
 		JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) quantum.getEditor();

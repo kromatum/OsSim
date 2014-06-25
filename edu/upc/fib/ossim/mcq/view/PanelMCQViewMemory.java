@@ -20,8 +20,6 @@ public class PanelMCQViewMemory extends PanelMemory {
 	public void addmcqViewPanel(MCQViewPanel mcqViewPanel){
 		layout.putConstraint(SpringLayout.EAST, mcqViewPanel, -10, SpringLayout.EAST, pane);
 		layout.putConstraint(SpringLayout.SOUTH, mcqViewPanel, -10, SpringLayout.SOUTH, pane);
-		layout.putConstraint(SpringLayout.WEST, mcqViewPanel, 10, SpringLayout.EAST, scroll2);
-		
 		pane.add(mcqViewPanel);
 		pane.repaint();
 	}
