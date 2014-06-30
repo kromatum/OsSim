@@ -121,7 +121,7 @@ public class FormProcess extends FormTemplate{
 			burstsCycle = new Vector<Integer>();
 			burstsCycle.add(0); // Initially, 1 CPU burst 
 		}
-//->récupération des données : variables, resources
+//->rï¿½cupï¿½ration des donnï¿½es : variables, resources
 		// variable READ and WRITE
 		Vector<Integer> variables;
 		if (values.size() > 2) {
@@ -149,7 +149,7 @@ public class FormProcess extends FormTemplate{
         Functions.getInstance().makeCompactGrid(grid, 6, 2, 6, 6, 6, 6);
 		pn.add(grid);
 		
-//->création du tableau de données qui permet de remplir les lignes du JTable : au départ, initialisation de la première ligne uniquement
+//->crï¿½ation du tableau de donnï¿½es qui permet de remplir les lignes du JTable : au dï¿½part, initialisation de la premiï¿½re ligne uniquement
 		
 		varPosition = 0;
 		verPosition = 0;
@@ -180,7 +180,7 @@ public class FormProcess extends FormTemplate{
 				row.add(new ColorCell("", Color.LIGHT_GRAY));
 			}
 //->
-			//ajouter les colonnes pour les opérations de lecture et écriture
+			//ajouter les colonnes pour les opï¿½rations de lecture et ï¿½criture
 			//variables
 			if(((ProcessPresenter) presenter).isSharedVariable()){
 				if(variables.size() != 0){
@@ -380,33 +380,33 @@ public class FormProcess extends FormTemplate{
 		}
 		
 //->	parcourir les cellules des colonnes P et V et retourner une erreur si les ressources prises ne sont pas rendues
-		//aucune opération ne se fait pendant les burst IO
+		//aucune opï¿½ration ne se fait pendant les burst IO
 		boolean p = false;		
 		
 		for(int r = 0; r < tablemodel.getRowCount(); r++) {
 
-			//vérifier qu'aucune opération n'a lieu pendant une IO
+			//vï¿½rifier qu'aucune opï¿½ration n'a lieu pendant une IO
 			if(((ProcessPresenter) presenter).isSharedVariable() || ((ProcessPresenter) presenter).getVerrouNumber() > 0){
 				if(((ColorCell) tablemodel.getValueAt(r, 2)).getColor().equals(Color.LIGHT_GRAY)){
-					//vérifier si le reste des cellules sont elles aussi grisées 
+					//vï¿½rifier si le reste des cellules sont elles aussi grisï¿½es 
 					for(int v=3; v<tablemodel.getColumnCount(); v++){
 						if(((ColorCell) tablemodel.getValueAt(r, v)).getColor().equals(Color.LIGHT_GRAY)){
-							JOptionPane.showMessageDialog(this.getParent(),"Aucune opération n'est possible pendant une IO","Error",JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(this.getParent(),"Aucune opï¿½ration n'est possible pendant une IO","Error",JOptionPane.ERROR_MESSAGE);
 							return false;
 						}
 					}
 				}
 			}			
-			//vérifier qu'une opération(lecture ou écriture) sur la variable partagée n'a pas lieu en même temps qu'une opération de jeton(prise ou remise)
+			//vï¿½rifier qu'une opï¿½ration(lecture ou ï¿½criture) sur la variable partagï¿½e n'a pas lieu en mï¿½me temps qu'une opï¿½ration de jeton(prise ou remise)
 			if(((ProcessPresenter) presenter).isSharedVariable() && ((ProcessPresenter) presenter).getVerrouNumber() > 0){
 				if((((ColorCell) tablemodel.getValueAt(r,varPosition)).getColor().equals(Color.LIGHT_GRAY) || ((ColorCell) tablemodel.getValueAt(r,varPosition+1)).getColor().equals(Color.LIGHT_GRAY))
 						&& (((ColorCell) tablemodel.getValueAt(r, verPosition)).getColor().equals(Color.LIGHT_GRAY) || ((ColorCell) tablemodel.getValueAt(r, verPosition+1)).getColor().equals(Color.LIGHT_GRAY))){
-					JOptionPane.showMessageDialog(this.getParent(),"Les opérations de lecture et d'écriture sur la variable partagée" 
-							+ " ne peuvent se faire en même temps que les opérations de prise ou de remise de jeton","Error",JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(this.getParent(),"Les opï¿½rations de lecture et d'ï¿½criture sur la variable partagï¿½e" 
+							+ " ne peuvent se faire en mï¿½me temps que les opï¿½rations de prise ou de remise de jeton","Error",JOptionPane.ERROR_MESSAGE);
 					return false;
 				}
 			}			
-			//vérifier la cohérence dans la prise et la remise de jeton
+			//vï¿½rifier la cohï¿½rence dans la prise et la remise de jeton
 			if(((ProcessPresenter) presenter).getVerrouNumber() > 0){
 				if(((ColorCell) tablemodel.getValueAt(r, verPosition)).getColor().equals(Color.LIGHT_GRAY)){
 					p = true;
@@ -416,7 +416,6 @@ public class FormProcess extends FormTemplate{
 							return false;
 						}else if(((ColorCell) tablemodel.getValueAt(c, verPosition+1)).getColor().equals(Color.LIGHT_GRAY)){
 							p = false;
-							r = c;
 							break;
 						}
 					}
@@ -428,7 +427,7 @@ public class FormProcess extends FormTemplate{
 					if(p){
 						p = false;
 					}else{
-						JOptionPane.showMessageDialog(this.getParent(),"Une remise de ressource est effectuée avant prise de celle-ci","Error",JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(this.getParent(),"Une remise de ressource est effectuï¿½e avant prise de celle-ci","Error",JOptionPane.ERROR_MESSAGE);
 						return false;
 					}
 				}
@@ -454,7 +453,7 @@ public class FormProcess extends FormTemplate{
 		data.add(color);
 		Vector<Integer> bursts= new Vector<Integer>();
 		
-//->	ajout des données sur les variables et sur les ressources
+//->	ajout des donnï¿½es sur les variables et sur les ressources
 		Vector<Integer> resources = new Vector<Integer>();
 		Vector<Integer> variables = new Vector<Integer>();
 		
