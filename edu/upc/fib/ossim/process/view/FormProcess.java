@@ -384,38 +384,21 @@ public class FormProcess extends FormTemplate{
 		boolean p = false;		
 		
 		for(int r = 0; r < tablemodel.getRowCount(); r++) {
-
-			//v�rifier qu'aucune op�ration n'a lieu pendant une IO
-			if(((ProcessPresenter) presenter).isSharedVariable() || ((ProcessPresenter) presenter).getVerrouNumber() > 0){
-				if(((ColorCell) tablemodel.getValueAt(r, 2)).getColor().equals(Color.LIGHT_GRAY)){
-					//v�rifier si le reste des cellules sont elles aussi gris�es 
-					for(int v=3; v<tablemodel.getColumnCount(); v++){
-						if(((ColorCell) tablemodel.getValueAt(r, v)).getColor().equals(Color.LIGHT_GRAY)){
-							JOptionPane.showMessageDialog(this.getParent(),"Aucune op�ration n'est possible pendant une IO","Error",JOptionPane.ERROR_MESSAGE);
-							return false;
-						}
-					}
-				}
-			}			
-			//v�rifier qu'une op�ration(lecture ou �criture) sur la variable partag�e n'a pas lieu en m�me temps qu'une op�ration de jeton(prise ou remise)
-			if(((ProcessPresenter) presenter).isSharedVariable() && ((ProcessPresenter) presenter).getVerrouNumber() > 0){
-				if((((ColorCell) tablemodel.getValueAt(r,varPosition)).getColor().equals(Color.LIGHT_GRAY) || ((ColorCell) tablemodel.getValueAt(r,varPosition+1)).getColor().equals(Color.LIGHT_GRAY))
-						&& (((ColorCell) tablemodel.getValueAt(r, verPosition)).getColor().equals(Color.LIGHT_GRAY) || ((ColorCell) tablemodel.getValueAt(r, verPosition+1)).getColor().equals(Color.LIGHT_GRAY))){
-					JOptionPane.showMessageDialog(this.getParent(),"Les op�rations de lecture et d'�criture sur la variable partag�e" 
-							+ " ne peuvent se faire en m�me temps que les op�rations de prise ou de remise de jeton","Error",JOptionPane.ERROR_MESSAGE);
-					return false;
-				}
-			}			
+			if(!validateFieldsSpecific(r))
+				return false;			
 			//v�rifier la coh�rence dans la prise et la remise de jeton
 			if(((ProcessPresenter) presenter).getVerrouNumber() > 0){
 				if(((ColorCell) tablemodel.getValueAt(r, verPosition)).getColor().equals(Color.LIGHT_GRAY)){
 					p = true;
 					for(int c=r+1; c < tablemodel.getRowCount(); c++){
+						if(!validateFieldsSpecific(c))
+							return false;
 						if(((ColorCell) tablemodel.getValueAt(c, verPosition)).getColor().equals(Color.LIGHT_GRAY)){
 							JOptionPane.showMessageDialog(this.getParent(),"Pas de prise multiple de ressource","Error",JOptionPane.ERROR_MESSAGE);
 							return false;
 						}else if(((ColorCell) tablemodel.getValueAt(c, verPosition+1)).getColor().equals(Color.LIGHT_GRAY)){
 							p = false;
+							r = c;
 							break;
 						}
 					}
@@ -435,6 +418,31 @@ public class FormProcess extends FormTemplate{
 		}
 		
 
+		return true;
+	}
+	
+	private boolean validateFieldsSpecific(int r){
+		//vérifier qu'aucune opération n'a lieu pendant une IO
+		if(((ProcessPresenter) presenter).isSharedVariable() || ((ProcessPresenter) presenter).getVerrouNumber() > 0){
+			if(((ColorCell) tablemodel.getValueAt(r, 2)).getColor().equals(Color.LIGHT_GRAY)){
+				//vérifier si le reste des cellules sont elles aussi grisées 
+				for(int v=3; v<tablemodel.getColumnCount(); v++){
+					if(((ColorCell) tablemodel.getValueAt(r, v)).getColor().equals(Color.LIGHT_GRAY)){
+						JOptionPane.showMessageDialog(this.getParent(),"Aucune opération n'est possible pendant une IO","Error",JOptionPane.ERROR_MESSAGE);
+						return false;
+					}
+				}
+			}
+		}
+		//vérifier qu'une opération(lecture ou écriture) sur la variable partagée n'a pas lieu en même temps qu'une opération de jeton(prise ou remise)
+		if(((ProcessPresenter) presenter).isSharedVariable() && ((ProcessPresenter) presenter).getVerrouNumber() > 0){
+			if((((ColorCell) tablemodel.getValueAt(r,varPosition)).getColor().equals(Color.LIGHT_GRAY) || ((ColorCell) tablemodel.getValueAt(r,varPosition+1)).getColor().equals(Color.LIGHT_GRAY))
+					&& (((ColorCell) tablemodel.getValueAt(r, verPosition)).getColor().equals(Color.LIGHT_GRAY) || ((ColorCell) tablemodel.getValueAt(r, verPosition+1)).getColor().equals(Color.LIGHT_GRAY))){
+				JOptionPane.showMessageDialog(this.getParent(),"Les opérations de lecture et d'écriture sur la variable partagée" 
+						+ " ne peuvent se faire en même temps que les opérations de prise ou de remise de jeton","Error",JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+		}
 		return true;
 	}
 
